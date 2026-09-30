@@ -27,8 +27,8 @@
 
 - [ ] Criar o repositório no GitHub, subir esta estrutura e adicionar todos como colaboradores.
 - [ ] Registrar a Ficha do sistema no README durante a reunião.
-- [ ] **Seção 1 — Descrição do sistema adversarial:** sistema e interação, atores e objetivos, ativo preservado, tabela de atores, detalhar os pressupostos P1–P3 e como falham, por que é adversarial.
-- [ ] **Diagrama de contexto** (`diagramas/contexto.mmd` → `contexto.png`).
+- [x] **Seção 1 — Descrição do sistema adversarial:** sistema e interação, atores e objetivos, ativo preservado, tabela de atores, detalhar os pressupostos P1–P3 e como falham, por que é adversarial.
+- [x] **Diagrama de contexto** (`diagramas/contexto.mmd` → `contexto.png`).
 - [ ] **Seção 5 — Redesenho e resiliência** para AM1–AM3 (a partir da Ficha): controles, mudança de incentivos, observabilidade, próxima adaptação e risco residual.
 - [ ] Integração final do README (com Maria Eduarda).
 - [ ] **Montagem do vídeo** com as gravações de todos e publicação no YouTube.
