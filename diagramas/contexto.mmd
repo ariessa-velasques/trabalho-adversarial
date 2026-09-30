@@ -1,9 +1,17 @@
 %% Diagrama de contexto — Responsável: Ariessa
-%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i contexto.mmd -o contexto.png
+%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i contexto.mmd -o contexto.png -b white -s 2
 flowchart LR
-    A([Bot caçador de cupons]) -->|cadastro, resgate| S[[PedeJá]]
-    B([Motor antifraude]) -->|regras, verificação| S
-    U([Usuário legítimo]) -->|uso normal| S
-    S -->|resposta observável| A
-    S -->|métricas, alertas| B
-    S -->|resultado| U
+    F([Fraudador]) -->|configura e opera| BOT[/"Bot caçador de cupons<br/>(jogador A)"/]
+    CLI([Cliente novo legítimo])
+
+    subgraph PJ[PedeJá]
+        direction TB
+        CAD[Cadastro de conta] --> CHK[Checkout com cupom BEMVINDO]
+        CHK <-->|"sinais de identidade ⟷<br/>aceita / recusa / pede verificação"| MAF{{"Motor antifraude<br/>(jogador B)"}}
+    end
+
+    BOT <-->|"cria contas, aplica cupom ⟷<br/>mensagens de recusa e verificação"| PJ
+    CLI <-->|"cria uma conta, aplica cupom ⟷<br/>mensagens e pedidos de verificação"| PJ
+
+    PJ <-->|"orçamento e metas ⟷<br/>métricas de fraude e conversão"| MKT([Equipe de produto/marketing])
+    PJ -->|pedido concluído| REST([Restaurante parceiro])
