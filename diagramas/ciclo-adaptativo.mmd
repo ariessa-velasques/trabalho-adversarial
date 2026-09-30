@@ -1,0 +1,14 @@
+%% Diagrama do ciclo adaptativo — Responsável: Vitoria
+%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i ciclo-adaptativo.mmd -o ciclo-adaptativo.png
+flowchart TD
+    subgraph R1[Rodada 1]
+        A1[Ação] --> RS1[Resposta] --> O1[Observação] --> AD1[Adaptação]
+    end
+    subgraph R2[Rodada 2]
+        A2[Ação] --> RS2[Resposta] --> O2[Observação] --> AD2[Adaptação]
+    end
+    subgraph R3[Rodada 3]
+        A3[Ação] --> RS3[Resposta] --> O3[Observação] --> AD3[Adaptação]
+    end
+    AD1 --> A2
+    AD2 --> A3

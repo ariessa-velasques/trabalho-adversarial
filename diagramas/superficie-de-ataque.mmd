@@ -1,0 +1,13 @@
+%% Diagrama de superfície de ataque — Responsável: Maria Eduarda
+%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i superficie-de-ataque.mmd -o superficie-de-ataque.png
+flowchart LR
+    ADV([Adversário])
+    subgraph SIS[Sistema]
+        I1[Interface / endpoint]
+        R1{{Regra / métrica}}
+        C1[(Componente / dados)]
+        I1 --> R1 --> C1
+    end
+    ADV -.->|PE1| I1
+    ADV -.->|PE2| R1
+    ADV -.->|PE3| C1
