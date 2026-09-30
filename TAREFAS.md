@@ -4,10 +4,12 @@
 
 ## Princípios
 
+- Os **jogadores A e B são agentes de software** (bot caçador de cupons × motor antifraude), como o professor pediu. Pessoas (fraudador, cliente legítimo) aparecem como atores, não como jogadores.
 - **Tudo parte da Ficha do sistema** (seção 0 do README), decidida em conjunto na reunião inicial. Depois dela, cada pessoa trabalha **em paralelo**, sem esperar ninguém.
 - **Nenhuma tarefa depende de outro integrante.** A Ficha já fixa os IDs dos pressupostos (P1–P3), pontos de exploração (PE1–PE3) e ameaças (AM1–AM3): cada seção detalha esses itens, mas **não renomeia nem remove** IDs.
 - As únicas etapas que juntam o trabalho de todos (integração, revisão de consistência, montagem do vídeo e entrega) ficam com **Ariessa e Maria Eduarda**.
 - Cada integrante **faz os próprios commits** (a nota é individual e considera o histórico do GitHub). Não façam commit pelos colegas.
+- **Commitem ao longo dos dias**, não tudo no final: o professor avalia a evolução passo a passo, e um commit único de última hora conta pouco.
 - Cada integrante **grava a fala da própria parte** no vídeo.
 - Na dúvida sobre nomes de atores, ações ou ativos: usem **exatamente** o que está na Ficha do sistema.
 
@@ -52,25 +54,28 @@
 - [ ] Responder as 5 perguntas de síntese (quem observa quem, o que muda, gatilho, custo, corrida armamentista).
 - [ ] Slides + gravação da fala do modelo dinâmico.
 
-### Guilherme Jaques (@Novato320) — Seções 7, 8, 9 e template da apresentação
+### Guilherme Jaques (@Novato320) — Seções 7, 8, 9, 10 e template da apresentação
 
-- [ ] **Seção 7 — Fundamentação conceitual:** definições curtas e referenciadas (jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ameaça × vulnerabilidade × risco).
-- [ ] **Seção 8 — `fontes/referencias.md`:** organizar as referências (material da disciplina, teoria dos jogos, modelagem de ameaças, fontes públicas sobre o sistema escolhido).
-- [ ] **Seção 9 — Declaração de uso de IA:** escrever o texto introdutório (cada integrante preenche a própria linha da tabela).
+- [ ] **Seção 7 — Conclusão: pergunta final** ("depois que o sistema responder, o que o outro lado aprenderá e tentará fazer em seguida?"), respondida para o PedeJá com base nas ameaças AM1–AM3 da Ficha.
+- [ ] **Seção 8 — Fundamentação conceitual:** definições curtas e referenciadas (jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso, risco e risco residual).
+- [ ] **Seção 9 — `fontes/referencias.md`:** organizar as referências (material da disciplina, teoria dos jogos, modelagem de ameaças, fontes públicas sobre o sistema escolhido).
+- [ ] **Seção 10 — Declaração de uso de IA:** escrever o texto introdutório (cada integrante preenche a própria linha da tabela).
 - [ ] Criar o **template no Canva** e compartilhar com o grupo **até quinta, 01/10** (antes de qualquer conteúdo); preencher `apresentacao/roteiro.md`.
 - [ ] Slides + gravação da fala de abertura e conclusão.
 
 ### Eduardo Dutra Ferreira (@ed-dferreira) — Seção 6
 
 - [ ] **Seção 6 — Arquitetura proposta para o Trabalho 2:** escopo mínimo implementável, componentes, fluxo principal, entidades de dados, regras/métricas, eventos registrados (logs para observabilidade) e dados sintéticos para teste.
-- [ ] Garantir que a proposta é **viável de implementar** no Trabalho 2 (escopo pequeno).
+- [ ] Garantir que a proposta é **viável de implementar** no Trabalho 2: os dois agentes (bot e motor antifraude) jogando em rodadas sobre um PedeJá simplificado. Pode dizer o que entra no Trabalho 2 e o que fica para depois.
 - [ ] Slides + gravação da fala da arquitetura.
 
 ---
 
 ## Tarefas de todos
 
-- [ ] Preencher **a própria linha** da declaração de uso de IA (seção 9 do README).
+- [ ] Preencher **a própria linha** da declaração de uso de IA (seção 10 do README).
+- [ ] **Ler o relatório inteiro** antes da apresentação: o professor pode perguntar qualquer parte a qualquer integrante, independentemente de quem escreveu.
+- [ ] Falar **sem ler** na gravação (o professor percebe e isso pesa na nota individual).
 - [ ] Montar os próprios slides no Canva compartilhado e **gravar a própria fala**; enviar à Ariessa até segunda, 05/10, às 18h.
 
 ## Etapa final

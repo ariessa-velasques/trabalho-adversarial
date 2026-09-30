@@ -2,7 +2,7 @@
 
 > Template no Canva: **Guilherme** (criado até 01/10). Cada integrante monta os próprios slides e **grava a própria fala** (arquivo de vídeo com os seus slides).
 > **Montagem do vídeo e publicação no YouTube: Ariessa.** Enviem suas gravações até segunda, 05/10, às 18h.
-> Meta: ~2 min por pessoa (falas equilibradas contam na nota).
+> Meta: ~2 min por pessoa (falas equilibradas contam na nota). **Falem sem ler**: o domínio do conteúdo é avaliado.
 
 | Ordem | Integrante | Conteúdo | Slides | Tempo |
 |-:|-|-|-|-|
