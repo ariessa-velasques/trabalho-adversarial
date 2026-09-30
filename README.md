@@ -26,10 +26,11 @@
 4. [Ameaças e riscos](#4-ameaças-e-riscos)
 5. [Redesenho e resiliência](#5-redesenho-e-resiliência)
 6. [Arquitetura proposta para o Trabalho 2](#6-arquitetura-proposta-para-o-trabalho-2)
-7. [Fundamentação conceitual](#7-fundamentação-conceitual)
-8. [Referências](#8-referências)
-9. [Declaração de uso de IA generativa](#9-declaração-de-uso-de-ia-generativa)
-10. [Contribuições individuais](#10-contribuições-individuais)
+7. [Conclusão: pergunta final](#7-conclusão-pergunta-final)
+8. [Fundamentação conceitual](#8-fundamentação-conceitual)
+9. [Referências](#9-referências)
+10. [Declaração de uso de IA generativa](#10-declaração-de-uso-de-ia-generativa)
+11. [Contribuições individuais](#11-contribuições-individuais)
 
 ---
 
@@ -41,9 +42,9 @@
 |-|-|
 | Sistema | **PedeJá**, aplicativo hipotético de delivery de comida que conecta clientes a restaurantes parceiros. |
 | Interação específica | **Resgate do cupom `BEMVINDO`**: toda conta nova recebe R$ 20 de desconto no primeiro pedido acima de R$ 30. O desconto é custeado pela plataforma. |
-| Ator/jogador A (adversário) | **Caçador de cupons**: pessoa que cria várias contas para resgatar o `BEMVINDO` repetidas vezes (para si ou para revender pedidos com desconto). |
-| Ator/jogador B (defensor/sistema) | **Plataforma (equipe antifraude)**: define as regras de elegibilidade e verificação e decide se o cupom é aceito. |
-| Outros atores | **Cliente novo legítimo**: quer usar o cupom uma única vez, com o mínimo de atrito. **Restaurante parceiro**: recebe os pedidos e ganha com o volume, mas não paga o cupom. |
+| Ator/jogador A (adversário) | **Bot caçador de cupons**: agente de software (script automatizado, operado por um fraudador) que cria contas e tenta resgatar o `BEMVINDO` repetidas vezes, ajustando sua estratégia conforme as respostas do checkout. |
+| Ator/jogador B (defensor/sistema) | **Motor antifraude do PedeJá**: agente de software que avalia cada cadastro e resgate, escolhe o nível de verificação e decide se o cupom é aceito, ajustando suas regras conforme as métricas observadas. |
+| Outros atores (humanos, não são jogadores) | **Fraudador**: opera e configura o bot. **Equipe de produto/marketing**: define o orçamento do cupom e cobra conversão. **Cliente novo legítimo**: quer usar o cupom uma única vez, com o mínimo de atrito. **Restaurante parceiro**: recebe os pedidos e ganha com o volume, mas não paga o cupom. |
 | Ativo ou propriedade preservada | **Distribuição justa do orçamento de aquisição**: um desconto por pessoa real. Secundários: a experiência de cadastro do cliente legítimo (conversão) e a confiança nos dados de cadastro. |
 | Regra/métrica explorável | "Um cupom **por conta**", sendo que conta nova = e-mail ainda não cadastrado. A regra pressupõe 1 conta = 1 pessoa. |
 | Resposta observável | O cupom é **aceito** ou **recusado**, com a mensagem exibida no checkout ("cupom válido apenas para primeira compra", "verifique seu telefone"...); a conta pode ser bloqueada; o sistema pode pedir verificações extras. |
@@ -60,6 +61,7 @@
 | verificação leve / rígida | ações B1 / B2 |
 | sinais de identidade | e-mail, telefone, CPF, dispositivo, endereço de entrega, cartão |
 | resgate | aplicação do cupom a um pedido concluído |
+| bot / motor antifraude | os dois agentes de software que jogam o jogo (A e B) |
 
 **Âncoras de rastreabilidade (IDs fixos — todas as seções referenciam estes IDs; cada seção detalha, mas não renomeia nem remove):**
 
@@ -69,7 +71,7 @@
 |-|-|-|
 | P1 | Cada conta corresponde a uma pessoa real diferente (e-mail novo = cliente novo). | E-mails descartáveis e variações do mesmo e-mail (`nome+1@...`) permitem criar contas em massa a custo quase zero. |
 | P2 | Telefone, CPF e dispositivo são caros ou difíceis de obter em quantidade. | Chips pré-pagos, números virtuais de SMS, CPFs vazados de terceiros e emuladores ou reset do identificador do aparelho reduzem esse custo. |
-| P3 | Um mesmo dispositivo ou endereço de entrega indica a mesma pessoa. | Famílias, repúblicas e colegas de trabalho compartilham aparelho e endereço (**falso positivo** contra o cliente legítimo); o caçador varia endereços (vizinho, portaria, ponto próximo). |
+| P3 | Um mesmo dispositivo ou endereço de entrega indica a mesma pessoa. | Famílias, repúblicas e colegas de trabalho compartilham aparelho e endereço (**falso positivo** contra o cliente legítimo); o bot varia endereços (vizinho, portaria, ponto próximo). |
 
 | ID | Ponto de exploração | Tipo |
 |-|-|-|
@@ -79,9 +81,9 @@
 
 | ID | Ameaça (resumo) | Ponto | Pressuposto ou fraqueza | Ativo afetado |
 |-|-|-|-|-|
-| AM1 | Caçador de cupons cria contas em massa com e-mails descartáveis e resgata o `BEMVINDO` em cada uma | PE1, PE2 | P1 | Orçamento de aquisição (distribuição justa) |
-| AM2 | Caçador de cupons passa pela verificação rígida usando números virtuais, CPFs de terceiros e aparelhos emulados | PE1 | P2 | Orçamento de aquisição; confiança nos dados de cadastro |
-| AM3 | Caçador de cupons testa variações e lê as mensagens de recusa para descobrir qual sinal o denunciou, trocando só esse sinal | PE3 | Fraqueza: mensagens de recusa detalhadas; P3 | Eficácia da defesa; experiência do cliente legítimo (defesa endurece e gera falsos positivos) |
+| AM1 | Bot caçador de cupons cria contas em massa com e-mails descartáveis e resgata o `BEMVINDO` em cada uma | PE1, PE2 | P1 | Orçamento de aquisição (distribuição justa) |
+| AM2 | Bot caçador de cupons passa pela verificação rígida usando números virtuais, CPFs de terceiros e aparelhos emulados | PE1 | P2 | Orçamento de aquisição; confiança nos dados de cadastro |
+| AM3 | Bot caçador de cupons testa variações e lê as mensagens de recusa para descobrir qual sinal o denunciou, trocando só esse sinal | PE3 | Fraqueza: mensagens de recusa detalhadas; P3 | Eficácia da defesa; experiência do cliente legítimo (defesa endurece e gera falsos positivos) |
 
 ---
 
@@ -272,21 +274,31 @@ _[Quais eventos/logs o sistema grava e que permitem ao defensor observar e se ad
 
 ---
 
-## 7. Fundamentação conceitual
+## 7. Conclusão: pergunta final
 
 > Responsável: **Guilherme**
 
-_[Definições curtas, com referência, dos conceitos usados no trabalho: sistema adversarial, jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ameaça × vulnerabilidade × impacto × risco.]_
+> **Depois que o sistema responder, o que o outro lado aprenderá e tentará fazer em seguida?**
+
+_[Responder para o PedeJá: depois da última resposta do motor antifraude (seção 3 / ameaça prioritária da seção 4), o que o bot aprende e qual é a próxima ação provável? E o que o motor antifraude aprende com isso?]_
 
 ---
 
-## 8. Referências
+## 8. Fundamentação conceitual
+
+> Responsável: **Guilherme**
+
+_[Definições curtas, com referência, dos conceitos usados no trabalho: sistema adversarial, jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso × impacto × risco, risco residual.]_
+
+---
+
+## 9. Referências
 
 Ver [`fontes/referencias.md`](fontes/referencias.md).
 
 ---
 
-## 9. Declaração de uso de IA generativa
+## 10. Declaração de uso de IA generativa
 
 > Responsável pelo texto: **Guilherme**. **Cada integrante preenche a própria linha** no seu próprio commit (se não usou IA, escreva "não utilizou").
 
@@ -303,7 +315,7 @@ _[Texto introdutório — Guilherme.]_
 
 ---
 
-## 10. Contribuições individuais
+## 11. Contribuições individuais
 
 | Integrante | Seções / artefatos | Fala na apresentação |
 |-|-|-|
@@ -311,7 +323,7 @@ _[Texto introdutório — Guilherme.]_
 | Maria Eduarda Sanchez Chessio | Seção 4; diagrama de superfície de ataque; revisão de consistência | Ameaças e riscos |
 | Mirieli Rodrigues dos Santos de Oliveira | Seção 2 | Modelo estático |
 | Vitoria Pereira Garcia | Seção 3; diagrama do ciclo adaptativo | Modelo dinâmico |
-| Guilherme Jaques | Seções 7, 8, 9; template dos slides | Fundamentos e conclusão |
+| Guilherme Jaques | Seções 7, 8, 9, 10; template dos slides | Fundamentos e conclusão |
 | Eduardo Dutra Ferreira | Seção 6 | Arquitetura para o Trabalho 2 |
 
 Histórico completo: ver commits do repositório.

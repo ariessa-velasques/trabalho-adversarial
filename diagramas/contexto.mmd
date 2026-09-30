@@ -1,8 +1,8 @@
 %% Diagrama de contexto — Responsável: Ariessa
 %% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i contexto.mmd -o contexto.png
 flowchart LR
-    A([Ator A]) -->|ação principal| S[[Sistema: NOME]]
-    B([Ator B / Defensor]) -->|regras, moderação| S
+    A([Bot caçador de cupons]) -->|cadastro, resgate| S[[PedeJá]]
+    B([Motor antifraude]) -->|regras, verificação| S
     U([Usuário legítimo]) -->|uso normal| S
     S -->|resposta observável| A
     S -->|métricas, alertas| B
