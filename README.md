@@ -1,6 +1,6 @@
 # Trabalho 1 — Análise de um Sistema Adversarial
 
-**Sistema analisado:** _[NOME DO SISTEMA]_ — **Interação:** _[INTERAÇÃO ESPECÍFICA]_
+**Sistema analisado:** aplicativo de delivery de comida (hipotético: _PedeJá_) — **Interação:** resgate do cupom de desconto de primeira compra (`BEMVINDO`)
 
 **Grupo 9**
 
@@ -39,16 +39,49 @@
 
 | Item | Decisão |
 |-|-|
-| Sistema | |
-| Interação específica | |
-| Ator/jogador A (adversário) | |
-| Ator/jogador B (defensor/sistema) | |
-| Outros atores | |
-| Ativo ou propriedade preservada | |
-| Regra/métrica explorável | |
-| Resposta observável | |
-| Decisão central do jogo (A1/A2 × B1/B2) | A1 = ; A2 = ; B1 = ; B2 = |
-| Fora do escopo | |
+| Sistema | **PedeJá**, aplicativo hipotético de delivery de comida que conecta clientes a restaurantes parceiros. |
+| Interação específica | **Resgate do cupom `BEMVINDO`**: toda conta nova recebe R$ 20 de desconto no primeiro pedido acima de R$ 30. O desconto é custeado pela plataforma. |
+| Ator/jogador A (adversário) | **Caçador de cupons**: pessoa que cria várias contas para resgatar o `BEMVINDO` repetidas vezes (para si ou para revender pedidos com desconto). |
+| Ator/jogador B (defensor/sistema) | **Plataforma (equipe antifraude)**: define as regras de elegibilidade e verificação e decide se o cupom é aceito. |
+| Outros atores | **Cliente novo legítimo**: quer usar o cupom uma única vez, com o mínimo de atrito. **Restaurante parceiro**: recebe os pedidos e ganha com o volume, mas não paga o cupom. |
+| Ativo ou propriedade preservada | **Distribuição justa do orçamento de aquisição**: um desconto por pessoa real. Secundários: a experiência de cadastro do cliente legítimo (conversão) e a confiança nos dados de cadastro. |
+| Regra/métrica explorável | "Um cupom **por conta**", sendo que conta nova = e-mail ainda não cadastrado. A regra pressupõe 1 conta = 1 pessoa. |
+| Resposta observável | O cupom é **aceito** ou **recusado**, com a mensagem exibida no checkout ("cupom válido apenas para primeira compra", "verifique seu telefone"...); a conta pode ser bloqueada; o sistema pode pedir verificações extras. |
+| Decisão central do jogo (A1/A2 × B1/B2) | **A1** = usar o cupom uma vez com a própria conta (**uso honesto**); **A2** = criar contas falsas para resgatar o cupom várias vezes (**multicontas**). **B1** = **verificação leve** (só e-mail); **B2** = **verificação rígida** (SMS no telefone + CPF + identificação do dispositivo). |
+| Fora do escopo | Pagamento e fraude de cartão, entrega e entregadores, avaliações de restaurantes, programa de fidelidade, outros cupons, ataques à infraestrutura (DoS, invasão). |
+
+**Vocabulário comum (usar exatamente estes termos em todas as seções):**
+
+| Termo | Significado |
+|-|-|
+| cupom `BEMVINDO` | desconto de R$ 20 na primeira compra acima de R$ 30 |
+| conta | cadastro no PedeJá (e-mail + senha; na verificação rígida também telefone e CPF) |
+| multicontas | várias contas controladas pela mesma pessoa |
+| verificação leve / rígida | ações B1 / B2 |
+| sinais de identidade | e-mail, telefone, CPF, dispositivo, endereço de entrega, cartão |
+| resgate | aplicação do cupom a um pedido concluído |
+
+**Âncoras de rastreabilidade (IDs fixos — todas as seções referenciam estes IDs; cada seção detalha, mas não renomeia nem remove):**
+
+> As ameaças usam o prefixo **AM** para não confundir com as ações **A1/A2** do jogo.
+
+| ID | Pressuposto | Como pode falhar |
+|-|-|-|
+| P1 | Cada conta corresponde a uma pessoa real diferente (e-mail novo = cliente novo). | E-mails descartáveis e variações do mesmo e-mail (`nome+1@...`) permitem criar contas em massa a custo quase zero. |
+| P2 | Telefone, CPF e dispositivo são caros ou difíceis de obter em quantidade. | Chips pré-pagos, números virtuais de SMS, CPFs vazados de terceiros e emuladores ou reset do identificador do aparelho reduzem esse custo. |
+| P3 | Um mesmo dispositivo ou endereço de entrega indica a mesma pessoa. | Famílias, repúblicas e colegas de trabalho compartilham aparelho e endereço (**falso positivo** contra o cliente legítimo); o caçador varia endereços (vizinho, portaria, ponto próximo). |
+
+| ID | Ponto de exploração | Tipo |
+|-|-|-|
+| PE1 | Formulário de cadastro de conta (e verificação de telefone/CPF na verificação rígida) | Interface |
+| PE2 | Regra de elegibilidade do cupom no checkout ("uma vez por conta") | Regra |
+| PE3 | Mensagens de recusa e de pedido de verificação exibidas no checkout | Fluxo / resposta observável |
+
+| ID | Ameaça (resumo) | Ponto | Pressuposto ou fraqueza | Ativo afetado |
+|-|-|-|-|-|
+| AM1 | Caçador de cupons cria contas em massa com e-mails descartáveis e resgata o `BEMVINDO` em cada uma | PE1, PE2 | P1 | Orçamento de aquisição (distribuição justa) |
+| AM2 | Caçador de cupons passa pela verificação rígida usando números virtuais, CPFs de terceiros e aparelhos emulados | PE1 | P2 | Orçamento de aquisição; confiança nos dados de cadastro |
+| AM3 | Caçador de cupons testa variações e lê as mensagens de recusa para descobrir qual sinal o denunciou, trocando só esse sinal | PE3 | Fraqueza: mensagens de recusa detalhadas; P3 | Eficácia da defesa; experiência do cliente legítimo (defesa endurece e gera falsos positivos) |
 
 ---
 
