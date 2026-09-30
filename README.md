@@ -6,7 +6,7 @@
 
 | Integrante | GitHub |
 |-|-|
-| Ariessa Velasques Oliveira | _[@usuário]_ |
+| Ariessa Velasques Oliveira | @ariessa-velasques |
 | Maria Eduarda Sanchez Chessio | @mariasanchez0 |
 | Mirieli Rodrigues dos Santos de Oliveira | @mirielii |
 | Vitoria Pereira Garcia | @vitoriapgarcia7 |
