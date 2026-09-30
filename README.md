@@ -93,25 +93,59 @@
 
 ### 1.1 Sistema e interação analisada
 
-_[Descrever o sistema e delimitar a interação específica.]_
+O **PedeJá** é um aplicativo hipotético de delivery de comida que conecta clientes a restaurantes parceiros. A plataforma ganha uma comissão sobre cada pedido e, para atrair novos clientes, oferece o cupom **`BEMVINDO`**: **R$ 20 de desconto no primeiro pedido acima de R$ 30**, pago com o orçamento de aquisição da própria plataforma (o restaurante recebe o valor cheio).
+
+O sistema de delivery como um todo não é o objeto da análise. O trabalho se concentra **em uma única interação: o resgate do cupom `BEMVINDO`**, que segue este fluxo:
+
+1. uma **conta** é criada no PedeJá (na verificação leve, apenas e-mail e senha);
+2. no primeiro pedido, o cupom `BEMVINDO` é aplicado no checkout;
+3. o **motor antifraude** avalia a conta e os **sinais de identidade** disponíveis (e-mail, telefone, CPF, dispositivo, endereço de entrega, cartão);
+4. o motor **aceita** o cupom, **recusa** o cupom (com uma mensagem no checkout) ou **pede uma verificação extra** (por exemplo, código por SMS);
+5. se o pedido for concluído com desconto, ocorre o **resgate**.
+
+A regra de negócio central é **"um cupom por conta"**. Ela foi pensada para "um cupom por pessoa", mas o sistema só consegue verificar contas. É nessa diferença entre **conta** e **pessoa** que surge o conflito: um **bot caçador de cupons** automatiza a criação de contas para resgatar o cupom várias vezes, e o motor antifraude tenta distinguir essas contas das de clientes novos legítimos sem afastá-los.
+
+Valores de referência (hipotéticos, usados em todo o trabalho):
+
+| Parâmetro | Valor |
+|-|-|
+| Desconto do `BEMVINDO` | R$ 20 por resgate |
+| Pedido mínimo | R$ 30 |
+| Orçamento mensal de aquisição | R$ 100.000 (≈ 5.000 resgates) |
+| Comissão da plataforma por pedido | 20% do valor do pedido |
 
 ### 1.2 Atores, objetivos e ativos
 
-_[Principais atores, objetivo de cada um, e o ativo/propriedade a preservar: justiça, confiança, privacidade, disponibilidade, distribuição correta de um recurso...]_
+Os **dois jogadores** da interação são **agentes de software**: o **bot caçador de cupons** (jogador A) e o **motor antifraude** (jogador B). Os demais atores são pessoas ou organizações que configuram os agentes ou sofrem as consequências das decisões deles, mas não jogam diretamente.
+
+**Ativo principal — distribuição justa do orçamento de aquisição.** O orçamento do `BEMVINDO` existe para trazer **pessoas novas** para a plataforma; cada resgate feito por uma conta falsa é dinheiro que não gera um cliente real e reduz o número de cupons disponíveis para clientes legítimos.
+
+**Ativos secundários:**
+
+- **Experiência de cadastro do cliente legítimo (conversão):** cada verificação extra aumenta o atrito, e parte dos clientes reais desiste no meio do caminho.
+- **Confiança nos dados de cadastro:** as métricas da plataforma (clientes novos, custo de aquisição) e as próprias decisões do motor antifraude dependem de os cadastros corresponderem a pessoas reais.
+- **Privacidade dos dados pessoais:** o motor coleta telefone, CPF e identificação do dispositivo; e o bot pode usar **CPFs de terceiros** obtidos em vazamentos, envolvendo pessoas que nem participam da interação.
+
+Esses ativos **competem entre si**: proteger o orçamento com verificações mais rígidas prejudica a conversão e aumenta a coleta de dados pessoais. Por isso o motor antifraude não pode simplesmente "verificar tudo ao máximo".
 
 | Ator | Objetivo | Ações ou capacidades | Informações observáveis | Restrições ou custos |
 |-|-|-|-|-|
-| | | | | |
-| | | | | |
-| | | | | |
+| **Bot caçador de cupons** (jogador A, software) | Maximizar o número de resgates do `BEMVINDO` com o menor custo por conta | Criar contas em lote; gerar e-mails descartáveis ou variações (`nome+1@...`); usar números virtuais de SMS e CPFs de terceiros; trocar o identificador do dispositivo (emulador); variar o endereço de entrega; repetir tentativas com variações | Se o cupom foi aceito ou recusado; o texto das mensagens de recusa e de verificação; quais verificações são pedidas e em que momento; se a conta foi bloqueada; taxa de sucesso por tipo de conta | Cada resgate exige um pedido real de pelo menos R$ 30 (o bot paga R$ 10 ou mais); números de SMS e CPFs têm custo e se esgotam; contas bloqueadas são perdidas; tempo de configuração e manutenção do script |
+| **Motor antifraude** (jogador B, software) | Garantir **um cupom por pessoa real**, recusando multicontas sem afastar clientes novos legítimos | Escolher o nível de verificação (leve ou rígida); pedir SMS e CPF; identificar o dispositivo; recusar o cupom; bloquear contas; ajustar limites e regras a partir das métricas; escolher o texto da mensagem de recusa | Sinais de identidade de cada conta; histórico de cadastros e resgates; volume de contas por dispositivo, endereço e cartão; taxas de aprovação, recusa e desistência no checkout; reclamações de clientes recusados | Custo de cada SMS e consulta de CPF; queda de conversão a cada verificação extra; **falsos positivos** (clientes reais recusados); **falsos negativos** (resgates fraudulentos aceitos); limites da LGPD sobre coleta de dados |
+| **Fraudador** (humano, operador do bot) | Obter comida com desconto ou revender pedidos com desconto | Configurar, pausar e reprogramar o bot; comprar números e CPFs; escolher quantas contas criar | Relatórios do bot (sucessos, recusas, mensagens) | Dinheiro investido em infraestrutura do bot; risco de bloqueio e de responsabilização legal |
+| **Cliente novo legítimo** (humano) | Usar o cupom **uma vez**, com o mínimo de atrito | Criar uma conta; informar telefone e CPF quando pedido; desistir do cadastro; reclamar no suporte | Mensagens do checkout; pedidos de verificação | Tempo e paciência limitados; pode compartilhar dispositivo ou endereço com outras pessoas (família, república) |
+| **Equipe de produto/marketing** (humano) | Adquirir muitos clientes novos dentro do orçamento | Definir valor e orçamento do cupom; cobrar do motor antifraude menos atrito ou menos fraude | Métricas de aquisição, conversão e custo por cliente novo | Orçamento limitado; metas de crescimento |
+| **Restaurante parceiro** | Receber mais pedidos | Aceitar e preparar pedidos | Volume de pedidos | Não controla o cupom; é pouco afetado diretamente (recebe o valor cheio) |
 
 ### 1.3 Pressupostos e como podem falhar
 
+O motor antifraude só funciona se alguns pressupostos forem verdadeiros. Cada um deles pode falhar **por ação intencional do bot** (e não apenas por acaso), e é daí que saem as ameaças da seção 4.
+
 | ID | Pressuposto | Como pode falhar |
 |-|-|-|
-| P1 | _[detalhar a partir da Ficha]_ | |
-| P2 | | |
-| P3 | | |
+| P1 | **Cada conta corresponde a uma pessoa real diferente.** A regra "um cupom por conta" só equivale a "um cupom por pessoa" se criar uma conta tiver algum custo para quem a cria. | Na verificação leve, uma conta nova depende só de um e-mail novo. O bot gera e-mails descartáveis ou variações do mesmo endereço (`nome+1@gmail.com`, `nome+2@gmail.com`) a custo praticamente zero, e cada um vira um "cliente novo" para o sistema. |
+| P2 | **Telefone, CPF e dispositivo são caros ou difíceis de obter em quantidade.** A verificação rígida parte do princípio de que uma pessoa tem poucos números de telefone, um único CPF e poucos aparelhos. | Existem números virtuais que recebem SMS por alguns reais, chips pré-pagos baratos, listas de CPFs vazados e emuladores que geram um novo identificador de dispositivo a cada execução. O custo por conta sobe, mas pode continuar menor que os R$ 20 de desconto. |
+| P3 | **Um mesmo dispositivo ou endereço de entrega indica a mesma pessoa.** O motor usa esses sinais para ligar várias contas a um único dono. | Falha nos **dois sentidos**: (a) pessoas diferentes compartilham aparelho e endereço (família, república, colegas de trabalho), e o motor recusa um **cliente legítimo** (falso positivo); (b) o bot varia o endereço (vizinho, portaria, ponto de retirada próximo) e troca o identificador do dispositivo, escapando da ligação (falso negativo). |
 
 ### 1.4 Diagrama de contexto
 
@@ -121,7 +155,22 @@ Fonte editável: [`diagramas/contexto.mmd`](diagramas/contexto.mmd)
 
 ### 1.5 Por que é adversarial (e não apenas erro ou acidente)
 
-_[Explicar a presença de intenção, objetivos conflitantes e adaptação.]_
+Uma conta duplicada ou um cupom aplicado duas vezes nem sempre indicam um adversário. Três situações parecidas ajudam a mostrar a diferença:
+
+| Situação | Tipo | Por quê |
+|-|-|-|
+| Cliente esquece a senha, cria uma segunda conta e usa o cupom de novo | **Acidente** | Não há intenção de explorar a regra nem adaptação: se o cupom for recusado, a pessoa simplesmente paga o valor cheio. |
+| Falha no código aplica o `BEMVINDO` duas vezes no mesmo pedido | **Erro** | O problema é do próprio sistema; corrigido o bug, ele não volta a acontecer. Ninguém do outro lado está tentando provocá-lo. |
+| Bot cria 200 contas por semana e muda de tática quando começa a ser recusado | **Adversarial** | Há um agente com intenção, objetivo conflitante e capacidade de se adaptar. |
+
+O resgate do `BEMVINDO` é adversarial porque reúne as características estudadas na disciplina:
+
+1. **Dois agentes que tomam decisões:** o bot decide quantas contas criar e com quais sinais de identidade; o motor antifraude decide o nível de verificação e se aceita ou recusa o cupom.
+2. **Objetivos conflitantes:** cada resgate fraudulento é um ganho para o bot e uma perda no orçamento da plataforma. O conflito é **parcial**, não total: um pedido feito com cupom fraudulento ainda gera comissão para a plataforma e venda para o restaurante. Por isso o motor não quer bloquear todo pedido suspeito a qualquer custo, e ainda precisa preservar a experiência do cliente legítimo.
+3. **Regra explorável:** "um cupom por conta" depende de os pressupostos P1–P3 se manterem; o bot ganha exatamente quando consegue quebrá-los.
+4. **Resposta observável e adaptação:** toda recusa, mensagem ou pedido de verificação **informa** o bot sobre o que foi detectado, e ele pode trocar a tática (e-mails descartáveis → números virtuais → emuladores). Da mesma forma, o motor observa as métricas de cadastros e resgates e ajusta as próprias regras. Nenhuma das duas decisões é tomada uma única vez: elas **evoluem em rodadas**, cada uma reagindo à anterior (seção 3).
+
+Um erro ou acidente, uma vez corrigido, deixa de acontecer. Já aqui, **cada defesa muda o comportamento do outro lado**, que é exatamente o que caracteriza um sistema adversarial.
 
 ---
 
