@@ -1,14 +1,59 @@
 %% Diagrama do ciclo adaptativo — Responsável: Vitoria
-%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i ciclo-adaptativo.mmd -o ciclo-adaptativo.png
-flowchart TD
-    subgraph R1[Rodada 1]
-        A1[Ação] --> RS1[Resposta] --> O1[Observação] --> AD1[Adaptação]
+%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i ciclo-adaptativo.mmd -o ciclo-adaptativo.png -b white -s 2
+%% Legenda: vermelho = bot (jogador A) | azul = motor antifraude (jogador B) | amarelo = observação | cinza = custo para o cliente legítimo
+flowchart TB
+    subgraph R1["RODADA 1 — AM1 / P1: verificação leve (B1)"]
+        A1["AÇÃO (bot)<br/>~200 contas com e-mails descartáveis<br/>e nome+N@, resgata o BEMVINDO"]
+        S1["RESPOSTA (motor, B1)<br/>aceita todos os cupons"]
+        OB1["Bot observa<br/>100% aceitos: e-mail novo basta"]
+        OM1["Motor observa<br/>pico de cadastros, sem 2ª compra,<br/>R$ 4.000 gastos (4% do orçamento)"]
+        DB1["Bot adapta<br/>mantém a tática e aumenta o volume"]
+        DM1["Motor adapta<br/>passa para verificação rígida (B2)"]
+        A1 --> S1
+        S1 --> OB1 --> DB1
+        S1 --> OM1 --> DM1
     end
-    subgraph R2[Rodada 2]
-        A2[Ação] --> RS2[Resposta] --> O2[Observação] --> AD2[Adaptação]
+
+    subgraph R2["RODADA 2 — AM2 / P2: verificação rígida (B2)"]
+        A2["AÇÃO (bot)<br/>números virtuais de SMS, CPFs vazados<br/>e emulador: custo por conta ≈ R$ 5"]
+        S2["RESPOSTA (motor, B2)<br/>exige SMS + CPF + dispositivo e recusa<br/>com mensagem específica"]
+        OB2["Bot observa<br/>a mensagem diz qual sinal foi recusado<br/>lucro ainda ≈ R$ 15 por resgate"]
+        OM2["Motor observa<br/>fraude cai, mas não some;<br/>faixas de números virtuais"]
+        CL2["Custo ao legítimo<br/>conversão do cadastro 70% → 55%"]
+        DB2["Bot adapta<br/>passa a sondar: troca um sinal por vez"]
+        DM2["Motor adapta<br/>regras por dispositivo e endereço (P3)"]
+        A2 --> S2
+        S2 --> OB2 --> DB2
+        S2 --> OM2 --> DM2
+        S2 -.-> CL2
     end
-    subgraph R3[Rodada 3]
-        A3[Ação] --> RS3[Resposta] --> O3[Observação] --> AD3[Adaptação]
+
+    subgraph R3["RODADA 3 — AM3 / P3: sondagem das mensagens"]
+        A3["AÇÃO (bot)<br/>varia um sinal por tentativa<br/>(dispositivo, endereço do vizinho)"]
+        S3["RESPOSTA (motor)<br/>recusa e informa qual sinal repetiu"]
+        OB3["Bot observa<br/>a mensagem funciona como oráculo"]
+        OM3["Motor observa<br/>tentativas com um só campo mudando;<br/>reclamações de famílias e repúblicas"]
+        CL3["Custo ao legítimo<br/>falsos positivos em endereço compartilhado"]
+        DB3["Bot adapta<br/>combina vários sinais de uma vez<br/>e testa em maior volume"]
+        DM3["Motor adapta<br/>mensagem genérica, limite de tentativas<br/>e canal de contestação"]
+        A3 --> S3
+        S3 --> OB3 --> DB3
+        S3 --> OM3 --> DM3
+        S3 -.-> CL3
     end
-    AD1 --> A2
-    AD2 --> A3
+
+    DB1 ==> A2
+    DM1 ==> S2
+    DB2 ==> A3
+    DM2 ==> S3
+    DB3 -. "próxima rodada:<br/>corrida armamentista" .-> A4(["Rodada 4 …"])
+    DM3 -.-> A4
+
+    classDef bot fill:#fde2e2,stroke:#c0392b,color:#000
+    classDef motor fill:#dbeafe,stroke:#1d4ed8,color:#000
+    classDef obs fill:#fef9c3,stroke:#a16207,color:#000
+    classDef custo fill:#e5e7eb,stroke:#4b5563,stroke-dasharray:4 3,color:#000
+    class A1,A2,A3,DB1,DB2,DB3 bot
+    class S1,S2,S3,DM1,DM2,DM3 motor
+    class OB1,OB2,OB3,OM1,OM2,OM3 obs
+    class CL2,CL3 custo
