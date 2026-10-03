@@ -23,13 +23,12 @@
 
 ## Tarefas individuais — de 01/10 a sábado, 03/10
 
-### Ariessa Velasques Oliveira — Coordenação, Seção 1 e Seção 5
+### Ariessa Velasques Oliveira — Coordenação e Seção 1
 
 - [ ] Criar o repositório no GitHub, subir esta estrutura e adicionar todos como colaboradores.
 - [ ] Registrar a Ficha do sistema no README durante a reunião.
 - [x] **Seção 1 — Descrição do sistema adversarial:** sistema e interação, atores e objetivos, ativo preservado, tabela de atores, detalhar os pressupostos P1–P3 e como falham, por que é adversarial.
 - [x] **Diagrama de contexto** (`diagramas/contexto.mmd` → `contexto.png`).
-- [ ] **Seção 5 — Redesenho e resiliência** para AM1–AM3 (a partir da Ficha): controles, mudança de incentivos, observabilidade, próxima adaptação e risco residual.
 - [ ] Integração final do README (com Maria Eduarda).
 - [ ] **Montagem do vídeo** com as gravações de todos e publicação no YouTube.
 
@@ -63,11 +62,11 @@
 - [ ] Criar o **template no Canva** e compartilhar com o grupo **até quinta, 01/10** (antes de qualquer conteúdo); preencher `apresentacao/roteiro.md`.
 - [ ] Slides + gravação da fala de abertura e conclusão.
 
-### Eduardo Dutra Ferreira (@ed-dferreira) — Seção 6
+### Eduardo Dutra Ferreira (@ed-dferreira) — Seções 5 e 6
 
-- [ ] **Seção 6 — Arquitetura proposta para o Trabalho 2:** escopo mínimo implementável, componentes, fluxo principal, entidades de dados, regras/métricas, eventos registrados (logs para observabilidade) e dados sintéticos para teste.
-- [ ] Garantir que a proposta é **viável de implementar** no Trabalho 2: os dois agentes (bot e motor antifraude) jogando em rodadas sobre um PedeJá simplificado. Pode dizer o que entra no Trabalho 2 e o que fica para depois.
-- [ ] Slides + gravação da fala da arquitetura.
+- [ ] **Seção 5 — Redesenho e resiliência (15 pts)** para AM1–AM3 (a partir da Ficha e da rodada 3 da Vitoria: mensagem genérica, limite de tentativas, canal de contestação): para cada ameaça, controle contextualizado, mudança de incentivo do bot, sinal/métrica observado pelo motor, próxima adaptação esperada do bot e risco residual. Explicar por que nenhuma defesa é definitiva.
+- [ ] **Seção 6 — Arquitetura para o Trabalho 2 (curta):** escopo, tecnologia escolhida (sugestão: Python + SQLite), componentes e eventos registrados (logs que alimentam as métricas da seção 5).
+- [ ] Slides + gravação da fala de redesenho e arquitetura.
 
 ---
 

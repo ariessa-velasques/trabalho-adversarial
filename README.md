@@ -311,7 +311,7 @@ Probabilidade e impacto: 1 = baixo, 2 = médio, 3 = alto. Risco = probabilidade 
 
 ## 5. Redesenho e resiliência
 
-> Responsável: **Ariessa** (a partir das ameaças AM1–AM3 da Ficha — não depende das notas de risco da seção 4)
+> Responsável: **Eduardo** (a partir das ameaças AM1–AM3 da Ficha e das adaptações da rodada 3 da seção 3 — não depende das notas de risco da seção 4)
 
 | Ameaça | Controle contextualizado | Mudança de incentivo | Sinal observável / métrica | Próxima adaptação esperada do adversário | Risco residual |
 |-|-|-|-|-|-|
@@ -327,7 +327,11 @@ _[Discutir por que nenhuma defesa é definitiva e como os controles alteram os p
 
 > Responsável: **Eduardo**
 
-### 6.1 Escopo mínimo implementável
+_[Seção curta: complementa a seção 5 e serve de base para o Trabalho 2. Não está nos critérios de avaliação do Trabalho 1.]_
+
+### 6.1 Escopo e tecnologia
+
+_[O que será implementado no Trabalho 2 (os dois agentes jogando rodadas sobre um PedeJá simplificado) e a tecnologia escolhida, com justificativa.]_
 
 ### 6.2 Componentes
 
@@ -335,17 +339,9 @@ _[Discutir por que nenhuma defesa é definitiva e como os controles alteram os p
 |-|-|-|-|
 | | | | |
 
-### 6.3 Fluxo principal da interação
+### 6.3 Eventos registrados (observabilidade)
 
-### 6.4 Modelo de dados (entidades principais)
-
-### 6.5 Regras de negócio e métricas exploráveis
-
-### 6.6 Eventos registrados (observabilidade)
-
-_[Quais eventos/logs o sistema grava e que permitem ao defensor observar e se adaptar.]_
-
-### 6.7 Dados sintéticos para testes
+_[Quais eventos/logs o sistema grava e que permitem ao motor antifraude observar e se adaptar (ligados às métricas da seção 5).]_
 
 ---
 
@@ -394,11 +390,11 @@ _[Texto introdutório — Guilherme.]_
 
 | Integrante | Seções / artefatos | Fala na apresentação |
 |-|-|-|
-| Ariessa Velasques Oliveira | Seções 0, 1, 5; diagrama de contexto; integração; montagem do vídeo | Introdução, sistema, redesenho |
+| Ariessa Velasques Oliveira | Seções 0 e 1; diagrama de contexto; integração; montagem do vídeo | Sistema, atores e pressupostos |
 | Maria Eduarda Sanchez Chessio | Seção 4; diagrama de superfície de ataque; revisão de consistência | Ameaças e riscos |
 | Mirieli Rodrigues dos Santos de Oliveira | Seção 2 | Modelo estático |
 | Vitoria Pereira Garcia | Seção 3; diagrama do ciclo adaptativo | Modelo dinâmico |
 | Guilherme Jaques | Seções 7, 8, 9, 10; template dos slides | Fundamentos e conclusão |
-| Eduardo Dutra Ferreira | Seção 6 | Arquitetura para o Trabalho 2 |
+| Eduardo Dutra Ferreira | Seções 5 e 6 | Redesenho e resiliência; arquitetura para o Trabalho 2 |
 
 Histórico completo: ver commits do repositório.
