@@ -25,8 +25,8 @@
 
 ### Ariessa Velasques Oliveira — Coordenação e Seção 1
 
-- [ ] Criar o repositório no GitHub, subir esta estrutura e adicionar todos como colaboradores.
-- [ ] Registrar a Ficha do sistema no README durante a reunião.
+- [x] Criar o repositório no GitHub, subir esta estrutura e adicionar todos como colaboradores.
+- [x] Registrar a Ficha do sistema no README durante a reunião.
 - [x] **Seção 1 — Descrição do sistema adversarial:** sistema e interação, atores e objetivos, ativo preservado, tabela de atores, detalhar os pressupostos P1–P3 e como falham, por que é adversarial.
 - [x] **Diagrama de contexto** (`diagramas/contexto.mmd` → `contexto.png`).
 - [ ] Integração final do README (com Maria Eduarda).
@@ -48,9 +48,9 @@
 
 ### Vitoria Pereira Garcia (@vitoriapgarcia7) — Seção 3
 
-- [ ] **Seção 3 — Modelo estratégico dinâmico:** tabela com ≥ 3 rodadas (ação → resposta → observação → adaptação), mostrando que o defensor também se adapta e que a defesa gera custo ao usuário legítimo (dica: as rodadas podem seguir P1 → P2 → P3 / AM1 → AM2 → AM3 da Ficha).
-- [ ] **Diagrama do ciclo adaptativo** (`diagramas/ciclo-adaptativo.mmd` → `.png`).
-- [ ] Responder as 5 perguntas de síntese (quem observa quem, o que muda, gatilho, custo, corrida armamentista).
+- [x] **Seção 3 — Modelo estratégico dinâmico:** tabela com ≥ 3 rodadas (ação → resposta → observação → adaptação), mostrando que o defensor também se adapta e que a defesa gera custo ao usuário legítimo (dica: as rodadas podem seguir P1 → P2 → P3 / AM1 → AM2 → AM3 da Ficha).
+- [x] **Diagrama do ciclo adaptativo** (`diagramas/ciclo-adaptativo.mmd` → `.png`).
+- [x] Responder as 5 perguntas de síntese (quem observa quem, o que muda, gatilho, custo, corrida armamentista).
 - [ ] Slides + gravação da fala do modelo dinâmico.
 
 ### Guilherme Jaques (@Novato320) — Seções 7, 8, 9, 10 e template da apresentação
@@ -98,11 +98,11 @@ Para exportar diagramas: `npx -p @mermaid-js/mermaid-cli mmdc -i diagramas/x.mmd
 
 ## Checklist de entrega
 
-- [ ] interação específica e bem delimitada
-- [ ] atores, objetivos, ativos, capacidades, informações e pressupostos
+- [x] interação específica e bem delimitada
+- [x] atores, objetivos, ativos, capacidades, informações e pressupostos
 - [ ] matriz de payoffs explicada
-- [ ] ≥ 3 rodadas de ação, resposta, observação e adaptação
-- [ ] 3 diagramas (PNG + fonte editável)
+- [x] ≥ 3 rodadas de ação, resposta, observação e adaptação
+- [ ] 3 diagramas (PNG + fonte editável) — faltam: superfície de ataque
 - [ ] ≥ 3 ameaças ligadas ao sistema
 - [ ] probabilidade, impacto e risco
 - [ ] resposta à ameaça prioritária, próxima adaptação e risco residual
