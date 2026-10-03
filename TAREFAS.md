@@ -17,7 +17,7 @@
 
 - [x] Escolher o sistema e **uma interação específica**: **cupom de primeira compra (`BEMVINDO`) no app de delivery PedeJá**.
 - [x] Preencher a **Ficha do sistema** (seção 0 do README): atores, ativo, regra explorável, resposta observável, as 4 ações do jogo (A1, A2, B1, B2), o vocabulário comum e as âncoras P1–P3, PE1–PE3, AM1–AM3.
-- [ ] Todos leem a Ficha, validam na reunião e confirmam que entenderam a própria tarefa.
+- [x] Todos leem a Ficha, validam na reunião e confirmam que entenderam a própria tarefa.
 
 ---
 
