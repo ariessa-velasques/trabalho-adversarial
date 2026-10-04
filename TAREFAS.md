@@ -34,8 +34,8 @@
 
 ### Maria Eduarda Sanchez Chessio — Seção 4 e revisão de consistência
 
-- [ ] **Seção 4 — Ameaças e riscos:** detalhar PE1–PE3, escrever AM1–AM3 no formato exigido, tabela de risco (probabilidade × impacto), escolher a prioritária e responder os 6 itens.
-- [ ] **Diagrama de superfície de ataque** (`diagramas/superficie-de-ataque.mmd` → `.png`).
+- [x] **Seção 4 — Ameaças e riscos:** detalhar PE1–PE3, escrever AM1–AM3 no formato exigido, tabela de risco (probabilidade × impacto), escolher a prioritária e responder os 6 itens.
+- [x] **Diagrama de superfície de ataque** (`diagramas/superficie-de-ataque.mmd` → `.png`).
 - [ ] Revisão de consistência (domingo, 04/10): conferir se atores, ações, pressupostos e ativos batem entre as seções 1 a 6 (rastreabilidade = 25 pts).
 
 ### Mirieli Rodrigues dos Santos de Oliveira (@mirielii) — Seção 2
@@ -102,10 +102,10 @@ Para exportar diagramas: `npx -p @mermaid-js/mermaid-cli mmdc -i diagramas/x.mmd
 - [x] atores, objetivos, ativos, capacidades, informações e pressupostos
 - [ ] matriz de payoffs explicada
 - [x] ≥ 3 rodadas de ação, resposta, observação e adaptação
-- [ ] 3 diagramas (PNG + fonte editável) — faltam: superfície de ataque
-- [ ] ≥ 3 ameaças ligadas ao sistema
-- [ ] probabilidade, impacto e risco
-- [ ] resposta à ameaça prioritária, próxima adaptação e risco residual
+- [x] 3 diagramas (PNG + fonte editável)
+- [x] ≥ 3 ameaças ligadas ao sistema
+- [x] probabilidade, impacto e risco
+- [x] resposta à ameaça prioritária, próxima adaptação e risco residual
 - [ ] referências, declaração de IA e contribuições individuais
 - [ ] commits de todos os integrantes
 - [ ] PDF dos slides e vídeo no YouTube com links no README
