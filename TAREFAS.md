@@ -40,7 +40,7 @@
 
 ### Mirieli Rodrigues dos Santos de Oliveira (@mirielii) — Seção 2
 
-- [ ] **Seção 2 — Modelo estratégico estático**, usando as ações A1/A2/B1/B2 da Ficha:
+- [x] **Seção 2 — Modelo estratégico estático**, usando as ações A1/A2/B1/B2 da Ficha:
   - matriz 2×2 com payoffs de 0 a 3 e a ordem do par informada;
   - o que representa cada ação e justificativa de cada uma das 4 células;
   - melhores respostas, estratégia dominante (se houver), equilíbrio e se ele é bom para usuários legítimos.
