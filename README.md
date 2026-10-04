@@ -212,30 +212,63 @@ que é exatamente o que caracteriza um sistema adversarial.
 
 **Ordem do par:** `(payoff de A, payoff de B)` — escala: 3 = melhor, 0 = pior.
 
-| Jogador A \ Jogador B | B1: _[ação]_ | B2: _[ação]_ |
-|-----------------------|-------------:|-------------:|
-| **A1: _[ação]_**      |      `( , )` |      `( , )` |
-| **A2: _[ação]_**      |      `( , )` |      `( , )` |
+| Jogador A \ Jogador B | B1: Verificação leve | B2: Verificação rígida |
+|-----------------------|---------------------:|------------------------:|
+| **A1: Conta única**   | `(2, 3)` | `(1, 1)` |
+| **A2: Multicontas**   | `(3, 0)` | `(2, 1)` |
 
 ### 2.1 O que representa cada ação
 
+O **Jogador A** representa o bot, que busca maximizar a quantidade de cupons `BEMVINDO` obtidos, reduzindo o custo necessário para criar contas aceitas pelo sistema.
+
+- **A1: Conta única:** o bot utiliza apenas uma conta e se comporta como um usuário legítimo, realizando apenas um resgate do cupom.
+- **A2: Multicontas:** o bot cria várias contas para tentar resgatar o cupom `BEMVINDO` repetidamente.
+
+O **Jogador B** representa o motor antifraude do PedeJá, que busca impedir o uso indevido do cupom sem prejudicar excessivamente os usuários legítimos.
+
+- **B1: Verificação leve:** a plataforma realiza apenas uma verificação simples, utilizando o e-mail para validar a conta.
+- **B2: Verificação rígida:** a plataforma utiliza verificações adicionais, como SMS, CPF e identificação do dispositivo.
+
 ### 2.2 Justificativa dos payoffs
 
-_[Justificar cada uma das 4 células, com base nos objetivos e custos da seção 1.]_
+- **A1 + B1 = `(2, 3)`:** o bot utiliza uma única conta e não realiza fraude. Para o bot, o benefício é limitado, pois consegue apenas um cupom. Para o motor antifraude, é uma situação favorável, pois há pouca necessidade de verificação e o cadastro é simples para usuários legítimos.
+
+- **A1 + B2 = `(1, 1)`:** o bot utiliza apenas uma conta, mas precisa passar por uma verificação mais rígida. Isso aumenta o custo e a dificuldade do cadastro sem haver uma tentativa de fraude, prejudicando a experiência do usuário.
+
+- **A2 + B1 = `(3, 0)`:** o bot consegue criar várias contas com facilidade e utilizar o cupom repetidamente. Essa é a melhor situação para o bot e a pior para o motor antifraude, pois o orçamento de aquisição é explorado por meio de multicontas.
+
+- **A2 + B2 = `(2, 1)`:** o bot continua tentando utilizar multicontas, mas encontra mecanismos adicionais de verificação. O custo do ataque aumenta, reduzindo sua vantagem. Para o motor antifraude, a situação é melhor do que B1, pois a verificação rígida dificulta a fraude.
 
 ### 2.3 Melhores respostas
 
-- Se B joga B1, a melhor resposta de A é ...
-- Se B joga B2, a melhor resposta de A é ...
-- Se A joga A1, a melhor resposta de B é ...
-- Se A joga A2, a melhor resposta de B é ...
+- Se B joga B1, a melhor resposta de A é **A2 (multicontas)**, pois `3 > 2`.
+- Se B joga B2, a melhor resposta de A é **A2 (multicontas)**, pois `2 > 1`.
+- Se A joga A1, a melhor resposta de B é **B1 (verificação leve)**, pois `3 > 1`.
+- Se A joga A2, a melhor resposta de B é **B2 (verificação rígida)**, pois `1 > 0`.
 
 ### 2.4 Estratégia dominante
 
+Para o **Jogador A**, a estratégia **A2 (multicontas)** é dominante, pois apresenta um payoff maior tanto quando o motor utiliza verificação leve quanto quando utiliza verificação rígida.
+
+Para o **Jogador B**, não existe uma estratégia dominante, pois sua melhor escolha depende da ação do bot.
+
 ### 2.5 Equilíbrio (nenhum jogador melhora mudando sozinho)
+
+O equilíbrio ocorre em **A2 + B2 = `(2, 1)`**.
+
+Nesse cenário, o bot utiliza multicontas e o motor antifraude utiliza verificação rígida.
+
+O bot não melhora ao mudar sozinho para A1, pois seu payoff cairia de `2` para `1`. Da mesma forma, o motor antifraude não melhora ao mudar sozinho para B1, pois seu payoff cairia de `1` para `0`.
+
+Portanto, nenhum dos jogadores melhora sua situação alterando sua estratégia individualmente.
 
 ### 2.6 O equilíbrio é bom para o sistema e para usuários legítimos?
 
+Não é um equilíbrio ideal para o sistema nem para os usuários legítimos.
+
+Embora a verificação rígida dificulte a ação do bot, ela também aumenta a quantidade de verificações exigidas dos usuários. Isso pode gerar maior atrito no cadastro e dificuldades para usuários legítimos.
+
+Assim, o equilíbrio representa uma situação de conflito entre o bot e o motor antifraude. O PedeJá precisa aumentar a proteção contra multicontas sem prejudicar excessivamente a experiência dos usuários legítimos.
 ---
 
 ## 3. Modelo estratégico dinâmico
