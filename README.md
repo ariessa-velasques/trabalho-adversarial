@@ -610,7 +610,10 @@ _[Responder para o PedeJá: depois da última resposta do motor antifraude (seç
 
 > Responsável: **Guilherme**
 
-_[Definições curtas, com referência, dos conceitos usados no trabalho: sistema adversarial, jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso × impacto × risco, risco residual.]_
+As definições abaixo são curtas e cada uma é ligada ao caso do **PedeJá**. Os números entre colchetes remetem a
+[`fontes/referencias.md`](fontes/referencias.md).
+
+
 
 ---
 
