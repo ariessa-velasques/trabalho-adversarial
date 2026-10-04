@@ -1,13 +1,49 @@
 %% Diagrama de superfície de ataque — Responsável: Maria Eduarda
-%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i superficie-de-ataque.mmd -o superficie-de-ataque.png
+%% Exportar: npx -p @mermaid-js/mermaid-cli mmdc -i superficie-de-ataque.mmd -o superficie-de-ataque.png -b white -s 2
+%% Legenda: vermelho = bot e seus insumos | laranja = ponto de exploração (PE) | azul = componentes internos do PedeJá | verde = ativos | linha grossa = ação do bot | tracejado = ameaça (AM) e ativo atingido
 flowchart LR
-    ADV([Adversário])
-    subgraph SIS[Sistema]
-        I1[Interface / endpoint]
-        R1{{Regra / métrica}}
-        C1[(Componente / dados)]
-        I1 --> R1 --> C1
+    F([Fraudador]) -->|configura| BOT[/"Bot caçador de cupons<br/>(jogador A)"/]
+    INS["Insumos do bot (fora do PedeJá)<br/>• e-mails descartáveis e nome+N@<br/>• números virtuais de SMS<br/>• CPFs vazados de terceiros<br/>• emulador de dispositivo<br/>• endereços variados"] --> BOT
+    CLI([Cliente novo legítimo])
+
+    subgraph PJ["PedeJá — superfície de ataque do cupom BEMVINDO"]
+        PE1["<b>PE1 · Interface</b><br/>Formulário de cadastro<br/>B1: e-mail · B2: + SMS, CPF, dispositivo"]
+        PE2{{"<b>PE2 · Regra</b><br/>Elegibilidade: 'uma vez por conta'<br/>+ pedido acima de R$ 30"}}
+        PE3[/"<b>PE3 · Fluxo / resposta</b><br/>Mensagens de recusa<br/>e de verificação no checkout"/]
+        BASE[("Base de contas e<br/>sinais de identidade")]
+        MAF{{"Motor antifraude (jogador B)<br/>B1/B2 · ligação por<br/>dispositivo e endereço"}}
+        PE1 --> BASE --> MAF
+        PE2 --> MAF
+        MAF -->|"aceita / recusa /<br/>pede verificação"| PE3
     end
-    ADV -.->|PE1| I1
-    ADV -.->|PE2| R1
-    ADV -.->|PE3| C1
+
+    BOT ==>|"1. cria contas em lote"| PE1
+    BOT ==>|"2. aplica o cupom"| PE2
+    PE3 ==>|"3. lê o motivo da recusa"| BOT
+    CLI -->|"uma conta, um cupom"| PE1
+    PE3 -->|"recusa, atrito"| CLI
+
+    PE1 -. "AM1 (P1)" .-> AT1
+    PE2 -. "AM1 (P1)" .-> AT1
+    PE1 -. "AM2 (P2)" .-> AT2
+    PE1 -. "AM2 (P2)" .-> AT3
+    PE3 -. "AM3 (mensagens detalhadas)" .-> AT1
+    PE3 -. "AM3 (P3)" .-> AT4
+
+    subgraph ATV["Ativos afetados"]
+        AT1[["Distribuição justa do<br/>orçamento de aquisição"]]
+        AT2[["Confiança nos dados<br/>de cadastro"]]
+        AT3[["Privacidade dos dados<br/>pessoais (titulares dos CPFs)"]]
+        AT4[["Experiência de cadastro do<br/>cliente legítimo (conversão)"]]
+    end
+
+    classDef bot fill:#fde2e2,stroke:#c0392b,color:#000
+    classDef pe fill:#ffedd5,stroke:#c2410c,stroke-width:2px,color:#000
+    classDef comp fill:#dbeafe,stroke:#1d4ed8,color:#000
+    classDef ativo fill:#dcfce7,stroke:#15803d,color:#000
+    classDef pessoa fill:#f3f4f6,stroke:#4b5563,color:#000
+    class BOT,INS bot
+    class PE1,PE2,PE3 pe
+    class BASE,MAF comp
+    class AT1,AT2,AT3,AT4 ativo
+    class F,CLI pessoa
