@@ -639,7 +639,17 @@ As definições abaixo são curtas e cada uma é ligada ao caso do **PedeJá**. 
 | **Impacto**              | Consequência da ameaça concretizada sobre o ativo [11].                                                                                                    | R$ 4.000 do orçamento (4%) em ≈ 200 resgates fraudulentos na rodada 1.                                     |
 | **Risco**                | Função da probabilidade de a ameaça ocorrer e do seu impacto [11]. Neste trabalho: risco = probabilidade × impacto, com escala de 1 a 3.                    | Tabela de risco da seção 4.4.                                                                              |
 | **Risco residual**       | Risco que permanece depois de aplicado um controle [11].                                                                                                   | Ex.: com mensagem genérica, o resultado aceito/recusado ainda informa o bot (seção 5.1).                   |
+
+ ### 8.3 Como os conceitos se encadeiam
  
+Um **ator** (o fraudador, por meio do bot) usa um **ataque** em um ponto da **superfície de ataque**, explorando uma
+**vulnerabilidade** (por exemplo, P1 falha), e causa um **impacto** sobre um **ativo**. A combinação de probabilidade e
+impacto define o **risco**. O **controle** do motor reduz o risco, mas deixa um **risco residual** e produz informação
+que o adversário usa na rodada seguinte, o que dá origem ao jogo repetido e à possível **corrida armamentista**.
+ 
+Dois cuidados do trabalho, alinhados ao enunciado: não tratar todo erro como ação adversarial (uma família que
+compartilha endereço é falso positivo, não ataque) e não confundir ator, ativo, ameaça, vulnerabilidade e impacto.
+
 ---
 
 ## 9. Referências
