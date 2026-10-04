@@ -346,7 +346,7 @@ Fonte editável: [`diagramas/ciclo-adaptativo.mmd`](diagramas/ciclo-adaptativo.m
 - **Qual é o custo da adaptação para cada lado?**
 
   | | Bot | Motor antifraude |
-                  |-|-|-|
+                          |-|-|-|
   | Custo da adaptação | Mais dinheiro por conta (R$ 0 → R$ 5 → R$ 8); contas e números "queimados"; tempo para reescrever o script | Custo de SMS e consulta de CPF em todo cadastro; engenharia e manutenção das regras; suporte; limites da LGPD sobre coleta de dados |
   | Quem mais paga | O fraudador | **Também o cliente legítimo** (atrito, falso positivo) e a equipe de produto (conversão) |
 
@@ -409,24 +409,61 @@ Probabilidade e impacto: 1 = baixo, 2 = médio, 3 = alto. Risco = probabilidade 
 
 ## 5. Redesenho e resiliência
 
-> Responsável: **Eduardo** (a partir das ameaças AM1–AM3 da Ficha e das adaptações da rodada 3 da seção 3 — não depende
-> das notas de risco da seção 4)
+> Responsável: **Eduardo**
 
 O redesenho do **PedeJá** busca preservar a **distribuição justa do orçamento de aquisição: um desconto por pessoa
-real**, equilibrando a redução do abuso, os custos da defesa e a experiência do **cliente novo legítimo**. Os controles
-abaixo respondem às ameaças **AM1–AM3**, aos pressupostos **P1–P3** e às adaptações da seção 3. O benefício permanece em
-**R$ 20 na primeira compra acima de R$ 30**. Os controles são propostas para o sistema hipotético, cuja eficácia deverá
-ser avaliada.
+real**, equilibrando a redução do abuso, os custos da defesa e a experiência do **cliente novo legítimo**. O benefício
+permanece em **R$ 20 na primeira compra acima de R$ 30**.
+
+Os controles respondem às ameaças **AM1–AM3**, aos pressupostos **P1–P3** e às adaptações da seção 3. Conforme a
+avaliação da seção 4, a **AM3 — sondagem das mensagens de recusa — é prioritária**, com risco inicial **3 × 3 = 9**.
+Para ela, o redesenho mantém os quatro controles da seção 4.5: **mensagem genérica, limite de tentativas, detecção de
+sondagem e canal de contestação**.
+
+As medidas são propostas para o sistema hipotético. Sua eficácia e seus efeitos sobre os clientes legítimos deverão ser
+avaliados na simulação do Trabalho 2.
 
 ### 5.1 Controles associados às ameaças
 
-| Ameaça                                     | Controle contextualizado                                                                                                                                                                                                                      | Mudança de incentivo                                                                                             | Sinal observável / métrica                                                                            | Próxima adaptação esperada do adversário                                                         | Risco residual                                                                                                  |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
-| **AM1 — criação de contas em massa**       | No **PE1** e no **PE2**, combinar limites por conta, sessão e conjuntos de sinais com o histórico de cadastros e resgates. Exigir **B2** diante de combinações suspeitas e intensificar a análise quando houver consumo anormal do orçamento. | Reduzir resgates por período e aumentar o esforço de distribuir contas, dificultando a exploração de **P1**.     | Concentração e ritmo de cadastros e resgates; descontos concedidos; acionamento de limites.           | Distribuir tentativas no tempo e entre sinais distintos; recorrer a **AM2**.                     | Ataques distribuídos podem passar; limites podem atrasar clientes legítimos.                                    |
-| **AM2 — contorno da verificação rígida**   | No **PE1**, verificar telefone, CPF e dispositivo; no **PE2**, avaliar relações entre contas e histórico de resgates, inclusive após aprovação em **B2**. Combinações suspeitas exigem análise adicional.                                     | Dificultar reutilização de recursos e exigir a substituição de vários sinais, elevando o custo por conta aceita. | Reutilização e combinações de sinais; resgates associados; aprovação, recusa e abandono após B2.      | Usar recursos distintos por conta e reduzir ligações observáveis.                                | Dados de terceiros e contas sem vínculos reconhecidos podem passar; relações legítimas podem parecer suspeitas. |
-| **AM3 — sondagem das mensagens de recusa** | No **PE3**, usar mensagens genéricas com contestação e registrar os motivos internamente. Combinar limites com intervalos progressivos entre tentativas suspeitas, observando alterações de um ou vários sinais.                              | Reduzir informação por tentativa e a velocidade dos testes, aumentando tempo e recursos necessários.             | Sequências de tentativas; intervalos impostos; alteração de sinais; contestações e decisões revistas. | Alternar sessões e dispositivos, espaçar testes e inferir regras pelo resultado aceito/recusado. | O resultado continua informativo; testes distribuídos podem contornar limites e intervalos.                     |
+| Ameaça                                                   | Controle contextualizado                                                                                                                                                                                                                                                                                        | Mudança de incentivo                                                                                                          | Sinal observável / métrica                                                                                    | Próxima adaptação esperada do adversário                                                                                                             | Risco residual                                                                                                                                                   |
+|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **AM1 — criação de contas em massa**                     | No **PE1** e no **PE2**, combinar limites por conta, sessão e conjuntos de sinais com o histórico de cadastros e resgates. Exigir **B2** diante de combinações suspeitas e intensificar a análise quando houver consumo anormal do orçamento.                                                                   | Reduzir resgates por período e aumentar o esforço de distribuir contas, dificultando a exploração de **P1**.                  | Concentração e ritmo de cadastros e resgates; descontos concedidos; acionamento de limites.                   | Distribuir tentativas no tempo e entre sinais distintos; recorrer a **AM2**.                                                                         | Ataques distribuídos podem passar; limites podem atrasar clientes legítimos.                                                                                     |
+| **AM2 — contorno da verificação rígida**                 | No **PE1**, verificar telefone, CPF e dispositivo; no **PE2**, avaliar relações entre contas e histórico de resgates, inclusive após aprovação em **B2**. Combinações suspeitas exigem análise adicional.                                                                                                       | Dificultar a reutilização de recursos e exigir a substituição de vários sinais, elevando o custo por conta aceita.            | Reutilização e combinações de sinais; resgates associados; aprovação, recusa e abandono após B2.              | Usar recursos distintos por conta e reduzir ligações observáveis.                                                                                    | Dados de terceiros e contas sem vínculos reconhecidos podem passar; relações legítimas podem parecer suspeitas.                                                  |
+| **AM3 — sondagem das mensagens de recusa (prioritária)** | No **PE3**, usar **mensagem genérica**, preservando o motivo interno; aplicar **limite de tentativas** por dispositivo, sessão e cartão; realizar **detecção de sondagem** por sequências de contas e alterações de sinais; oferecer **canal de contestação**. Intervalos progressivos complementam os limites. | Reduzir a informação revelada e a velocidade dos testes, elevando o tempo e os recursos necessários para descobrir as regras. | Sequências de tentativas; sinais alterados; limites e intervalos acionados; contestações e decisões revistas. | Alternar sessões e dispositivos, espaçar testes, variar vários sinais, inferir regras pelo resultado aceito/recusado e tentar abusar da contestação. | **Probabilidade 2 × impacto 2 = 4**, conforme a seção 4.5. O resultado continua informativo, testes distribuídos podem passar e a contestação pode sofrer abuso. |
 
-### 5.2 Proteção do cliente legítimo
+### 5.2 Tratamento prioritário da AM3
+
+Os quatro controles da seção 4.5 atuam em conjunto:
+
+1. **Mensagem genérica:** as recusas do cupom usam uma mensagem pública única, como “Não foi possível aplicar o cupom
+   neste pedido”, acompanhada da opção de contestação. O motivo específico fica no registro interno. Isso reduz a
+   informação entregue ao bot, mas não elimina a aprendizagem pelo resultado aceito/recusado nem pelas verificações
+   solicitadas.
+
+2. **Limite de tentativas:** limitar as tentativas por dispositivo, sessão e cartão sintético. O exemplo da seção 4.5,
+   **3 tentativas em 24 horas**, será uma configuração inicial para teste. Atingido o limite, novas tentativas ficam
+   temporariamente indisponíveis no escopo correspondente. Intervalos progressivos podem complementar esse controle
+   diante de repetição suspeita. Esses parâmetros não são valores comprovadamente ideais e deverão ser comparados na
+   simulação.
+
+3. **Detecção de sondagem:** analisar sequências de contas e tentativas relacionadas, incluindo alterações de um único
+   sinal e de vários sinais. Quando houver evidência combinada suficiente, o motor poderá recusar o conjunto de
+   tentativas relacionadas, aplicar espera ou encaminhar para revisão. O compartilhamento isolado de endereço ou
+   dispositivo não será tratado como prova de fraude, conforme **P3**.
+
+4. **Canal de contestação:** permitir que o cliente solicite revisão da recusa com evidência adicional. A revisão poderá
+   manter, reverter ou considerar inconclusiva a decisão. Não haverá aprovação automática, pois o bot também pode tentar
+   explorar esse canal. No Trabalho 2, toda evidência será simulada, sem documentos pessoais reais.
+
+Mantém-se o **risco residual estimado de 2 × 2 = 4** da seção 4.5. A redução de probabilidade representa a necessidade
+de mais recursos e tentativas distribuídas para aprender as regras. A redução de impacto representa a menor precisão da
+informação obtida em cada recusa, dificultando o contorno direcionado.
+
+Essa classificação é uma **estimativa qualitativa**, não uma medição nem uma garantia de eficácia. Se os experimentos
+indicarem outra avaliação, as seções 4.5 e 5 deverão ser atualizadas em conjunto. A mensagem genérica, isoladamente, não
+resolve **AM2** nem os falsos positivos associados a **P3**.
+
+### 5.3 Proteção do cliente legítimo
 
 Propõe-se manter **B1 — verificação leve** quando não houver indícios suficientes de abuso e exigir **B2 — verificação
 rígida** diante de combinações suspeitas. A decisão sobre o cupom deve considerar conjuntamente as verificações e o
@@ -440,62 +477,72 @@ comprova pessoas distintas. A ausência de segunda compra também não demonstra
 decorrer de sinais compartilhados e a evidência for insuficiente, deve-se priorizar verificação adicional ou revisão
 antes da recusa definitiva.
 
-O checkout deve informar a recusa sem revelar a regra específica, enquanto o registro interno preserva os motivos para
-análise. A contestação permite revisar possíveis falsos positivos, mas gera custo de atendimento e não implica aprovação
-automática.
+As mensagens genéricas dificultam que o cliente compreenda a recusa. Por isso, o canal de contestação deve estar
+acessível no checkout. Ainda assim, a revisão gera espera, custo de atendimento e possibilidade de desistência. Erros de
+preenchimento devem permitir correção sem revelar critérios internos do motor, e o efeito dos limites sobre essas
+tentativas precisa ser avaliado.
 
 Para conter o dano durante novas ondas de abuso, propõe-se acompanhar o valor e a velocidade dos resgates. Um limiar de
 alerta deve acionar verificação ou revisão adicional das combinações suspeitas, sem suspender automaticamente todos os
 cupons. Esse mecanismo pode retardar o consumo indevido, mas não garante um teto de perdas, pois parte do abuso pode
 permanecer sem identificação.
 
-### 5.3 Efeitos sobre os incentivos e os payoffs
+### 5.4 Efeitos sobre os incentivos e os payoffs
 
 Na simplificação da seção 3, o benefício líquido do desconto para o bot é:
 
-$$
-G_{\text{bot}} = \text{R\$}\,20 - c
-$$
+**G_bot = R$ 20 − c**
 
 **c** representa o custo médio para obter uma conta aceita e concluir um resgate, incluindo os recursos empregados nas
-tentativas frustradas necessárias para esse resultado. Esses custos devem ser contabilizados uma única vez. Com custos
-aproximados de R\$ 0, R\$ 5 e R\$ 8, o benefício líquido do desconto permanece em R\$ 20, R\$ 15 e R\$ 12,
-respectivamente.
+tentativas frustradas necessárias para esse resultado. Esses custos devem ser contabilizados uma única vez.
+
+Com custos aproximados de R\$ 0, R\$ 5 e R\$ 8, o benefício líquido do desconto permanece em R\$ 20, R\$ 15 e R\$ 12,
+respectivamente. Esse benefício representa a economia com o desconto após os custos do abuso, não o lucro total de uma
+operação de revenda de pedidos.
+
 Portanto, elevar o custo não elimina necessariamente o incentivo. O benefício é zero em c = R\$ 20 e negativo acima
 disso, dentro dessa simplificação.
+
 Os controles procuram alterar os payoffs da seção 2 da seguinte forma:
 
 - **A1/B1:** preservar o baixo atrito da conta única.
-- **A1/B2:** reduzir verificações desnecessárias e permitir revisão de recusas indevidas.
+- **A1/B2:** reduzir o dano de recusas indevidas por meio da revisão; na política adaptativa, evitar exigir B2 sem
+  indícios suficientes.
 - **A2/B1:** reduzir a velocidade dos resgates repetidos por limites, intervalos e análise de histórico.
 - **A2/B2:** elevar o custo de substituir sinais e reduzir resgates indevidos pela análise entre contas, considerando o
   custo da defesa.
 
-Além de elevar **c**, limites e intervalos procuram reduzir a quantidade de resgates obtidos por período. Os custos das
-tentativas frustradas devem ser considerados sem dupla contagem caso já estejam incluídos em **c**. Esses efeitos
-indicam mudanças pretendidas, sem estabelecer novos valores de payoff, estratégia dominante ou equilíbrio. Para o motor,
-o benefício depende de a redução do abuso compensar verificações, manutenção, atendimento e perda de conversão. A
-diferença aproximada de R\$ 14 entre desconto e comissão, para pedidos próximos e superiores a R\$ 30, não representa
-economia garantida por recusa.
+O redesenho combina B1 e B2 com controles adicionais. Por isso, esses efeitos descrevem mudanças pretendidas nos
+resultados das combinações, sem atribuir novos valores à matriz nem concluir uma estratégia dominante ou um equilíbrio
+antes da avaliação.
 
-### 5.4 Avaliação e resiliência
+Além de elevar **c**, limites e intervalos procuram reduzir a quantidade de resgates obtidos por período. Para o motor,
+o benefício depende de a redução do abuso compensar verificações, manutenção, atendimento e perda de conversão. A
+diferença aproximada de R\$ 14 entre desconto e comissão, para pedidos próximos e superiores a R\$ 30, não
+representa economia garantida por recusa.
+
+### 5.5 Avaliação e resiliência
 
 A avaliação deve acompanhar:
 
 - **Orçamento:** quantidade, valor e velocidade dos resgates; acionamento dos alertas.
-- **Indícios de abuso:** relações entre contas, concentração de sinais, tentativas sucessivas e acionamento de limites e
-  intervalos.
-- **Experiência do cliente:** conclusão de cadastros e pedidos, abandono após B2, tempo de revisão e decisões
+- **Indícios de abuso:** relações entre contas, concentração de sinais, sequências de sondagem e acionamento de limites
+  e intervalos.
+- **Experiência do cliente:** conclusão de cadastros e pedidos, abandono após B2 ou espera, tempo de revisão e decisões
   revertidas.
 - **Custo da defesa:** verificações, atendimento e manutenção das regras.
 
 Recusas não equivalem a fraudes detectadas, nem resgates aceitos comprovam legitimidade. Contestações ajudam a
-identificar possíveis falsos positivos, mas não revelam todos os erros. Limites, janelas de tempo e metas deverão ser
-avaliados na simulação do Trabalho 2.
+identificar possíveis falsos positivos, mas não revelam todos os erros. Na simulação, o avaliador poderá calcular esses
+erros com os rótulos sintéticos; o motor não terá acesso a esses rótulos.
 
-**Nenhuma defesa é definitiva:** o bot pode distribuir tentativas, substituir sinais e aprender com as respostas do
-checkout. A resiliência exige observar resultados, ajustar controles, revisar decisões e acompanhar novas adaptações,
-considerando a privacidade e a finalidade dos dados utilizados.
+Para a **AM3**, será necessário comparar a configuração com mensagens detalhadas à configuração com os quatro controles
+da seção 4.5. O objetivo é verificar se a sondagem exige mais tentativas, tempo e recursos e se essa redução de vantagem
+compensa o atrito e o atendimento adicionais. Os resultados subsidiarão a revisão da estimativa de risco residual **4**.
+
+**Nenhuma defesa é definitiva:** o bot pode distribuir tentativas, substituir sinais, explorar a contestação e aprender
+com as respostas do checkout. A resiliência exige observar resultados, ajustar controles, revisar decisões e acompanhar
+novas adaptações, considerando a privacidade e a finalidade dos dados utilizados.
 
 Permanecem riscos de multicontas aceitas, clientes legítimos recusados, uso de dados de terceiros e aprendizagem do bot.
 O objetivo é reduzir a vantagem do abuso sem comprometer a distribuição justa do cupom e a experiência do cliente
@@ -507,125 +554,166 @@ legítimo.
 
 > Responsável: **Eduardo**
 
-Esta seção complementa a seção 5 e serve de base para o Trabalho 2. Usa os nomes da Ficha do sistema (A1/A2, B1/B2,
-P1–P3, AM1–AM3, PE1–PE3).
+Esta seção complementa a seção 5 e serve de base para o Trabalho 2. Usa os nomes da Ficha do sistema (**A1/A2, B1/B2,
+P1–P3, AM1–AM3, PE1–PE3**) e inclui os quatro controles da ameaça prioritária **AM3**, descritos na seção 4.5.
 
 ### 6.1 Escopo e tecnologia
 
 No Trabalho 2 será implementado um **simulador simplificado do resgate do cupom `BEMVINDO` no PedeJá**, em que os dois
-agentes jogam rodadas. Cada rodada é uma janela de tempo simulada (por exemplo, uma semana). Nela, o **bot caçador de
-cupons** escolhe **A1** (conta única, com comportamento de cliente legítimo) ou **A2** (multicontas) e tenta resgatar o
-cupom; o **motor antifraude** escolhe **B1** (verificação leve) ou **B2** (verificação rígida) e decide aceitar, recusar
-ou pedir verificação extra. Cada lado se adapta ao que consegue observar, como na seção 3.
+agentes jogam rodadas. Cada rodada corresponde a uma janela de tempo simulada, por exemplo, uma semana.
 
-**Demonstração:** três rodadas (número ampliável), em dois modos: **guiado**, que reproduz a sequência AM1 → AM2 → AM3
-da seção 3 como roteiro didático, e **adaptativo**, em que os agentes só mudam de comportamento quando suas observações
-acionam as regras configuradas, sem sequência garantida.
+Nela, o **bot caçador de cupons** escolhe **A1** — conta única, sem ataque — ou **A2** — multicontas — e tenta resgatar
+o cupom. O **motor antifraude** escolhe **B1** ou **B2**, avalia a elegibilidade e decide aceitar, recusar, pedir
+verificação extra ou impor espera quando os controles adicionais estiverem ativos.
+
+O estado permanece entre rodadas: uma conta que já concluiu a primeira compra não recupera a elegibilidade ao começar
+uma nova rodada.
+
+**Demonstração:** três rodadas, com número ampliável, em dois modos:
+
+- **Guiado:** reproduz a sequência **AM1 → AM2 → AM3** da seção 3 como roteiro didático. As mudanças previstas pelo
+  roteiro são identificadas como programadas.
+- **Adaptativo:** os agentes só mudam de comportamento quando suas observações acionam as regras configuradas, sem
+  sequência garantida.
 
 **O simulador terá:**
 
-- clientes, contas e pedidos **sintéticos** (identificadores fictícios, sem dados reais), incluindo clientes legítimos
-  que compartilham endereço ou dispositivo (P3);
-- a regra do cupom: R\$ 20 de desconto no primeiro pedido acima de R\$ 30, debitado de um orçamento limitado somente
-  quando o pedido é concluído;
-- três políticas de defesa para comparação: **B1**, **B2** e o **redesenho da seção 5**, com seus controles: B2 por
-  indícios, limites por conta, sessão e sinais correlacionados, intervalos progressivos, mensagens genéricas, alerta de
-  orçamento e contestação;
-- as métricas da seção 5.4 (orçamento, indícios de abuso, experiência do cliente e custo da defesa), mais falsos
-  positivos e falsos negativos, calculados com a identidade sintética conhecida só pelo avaliador.
+- clientes, contas, pedidos e sinais de identidade **sintéticos**, incluindo clientes legítimos que compartilham
+  endereço ou dispositivo (**P3**);
+- a regra do cupom: **R$ 20 de desconto no primeiro pedido com valor estritamente superior a R$ 30**, debitado do
+  orçamento somente quando o pedido é concluído;
+- três configurações de defesa para comparação: **B1 fixa**, **B2 fixa** e o **redesenho da seção 5**, que escolhe B1/B2
+  por indícios e acrescenta os controles propostos;
+- os quatro controles da **AM3**: **mensagem genérica, limite de tentativas, detecção de sondagem e canal de
+  contestação**;
+- intervalos progressivos, análise de relações entre contas e alerta de orçamento;
+- as métricas da seção 5.5, incluindo falsos positivos e falsos negativos calculados pelo avaliador;
+- registro dos custos, tentativas e tempo necessários para o bot obter resgates.
 
-Ficam fora do escopo os mesmos itens da Ficha (pagamento, entrega, outros cupons, ataques à infraestrutura). SMS, CPF e
-dispositivo são dados e verificações simulados.
+Ficam fora do escopo os mesmos itens da Ficha: pagamento e fraude de cartão, entrega, outros cupons e ataques à
+infraestrutura. SMS, CPF, dispositivo e cartão são representados por identificadores e verificações simulados. O cartão
+serve apenas como sinal de correlação, sem processamento de pagamento.
 
 **Tecnologia:** **Python com Streamlit**, executado localmente em um único processo. Os agentes são funções ou classes
-baseadas em regras, sem modelos de IA; Pandas organiza tabelas e indicadores, e sementes aleatórias registradas permitem
-repetir os experimentos. A escolha se justifica por permitir interface, execução e gráficos com pouco código e sem
-serviços externos, mantendo o foco na lógica da interação.
+baseadas em regras, sem modelos de IA. Pandas organiza tabelas e indicadores; configurações e sementes aleatórias
+registradas permitem repetir os experimentos. A escolha permite interface web, execução e gráficos com pouco código e
+sem serviços externos, mantendo o foco na lógica da interação.
 
-**Separação de informação:** o bot só vê as respostas públicas das próprias tentativas; o motor vê sinais, tentativas e
-resultados, mas não recebe o rótulo "fraudador" nem a identidade sintética; só o avaliador sabe quem controla cada
-conta.
+**Separação de informação:** o bot conhece suas próprias ações, recursos e respostas públicas. O motor vê sinais
+apresentados, histórico operacional e resultados de revisões, mas não recebe o rótulo “fraudador” nem a identidade
+sintética que vincula cada conta ao seu controlador real. Essa ligação é mantida separadamente para geração dos cenários
+e avaliação.
 
 ### 6.2 Componentes
 
 São divisões lógicas do mesmo programa, não serviços separados.
 
-| Componente                    | Responsabilidade                                                                                                | Entradas                                            | Saídas                                                               |
-|-------------------------------|-----------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|----------------------------------------------------------------------|
-| Interface web                 | Configurar o experimento, executar as rodadas e mostrar resultados.                                             | Parâmetros e comandos do usuário.                   | Painéis, tabelas e arquivos CSV.                                     |
-| Gerador de cenários           | Criar clientes, contas, pedidos e sinais de identidade sintéticos, incluindo compartilhamento legítimo.         | Sementes e quantidades.                             | Dados sintéticos e agenda inicial de ações.                          |
-| Controlador de rodadas        | Ordenar os eventos, avançar o tempo simulado e manter o estado entre rodadas.                                   | Agenda, configuração e estado atual.                | Chamadas aos agentes e fechamento de cada rodada.                    |
-| Bot caçador de cupons         | Executar A1 ou A2 e adaptar recursos, ritmo e sinais conforme as respostas.                                     | Estratégia atual e respostas públicas do checkout.  | Cadastros, tentativas de resgate e mudanças de estratégia.           |
-| Cadastro e checkout do PedeJá | Representar PE1 e PE2: aplicar as regras do cupom e concluir pedidos.                                           | Dados da conta, pedido e decisão do motor.          | Resposta pública e resgate.                                          |
-| Motor antifraude              | Escolher B1/B2, analisar sinais e histórico, aplicar limites, intervalos e mensagens, e adaptar a política.     | Eventos operacionais observáveis e regras vigentes. | Aprovação, recusa, verificação extra ou espera; motivo interno.      |
-| Revisão de contestações       | Reavaliar recusas contestadas com evidência simulada adicional.                                                 | Contestação, histórico e evidência.                 | Decisão mantida, revertida ou inconclusiva; custo e atraso.          |
-| Registro de eventos           | Guardar ações, decisões, custos e mudanças em ordem temporal, com resultado público separado do motivo interno. | Eventos dos demais componentes.                     | Histórico público e histórico interno.                               |
-| Avaliador                     | Comparar as decisões com a identidade sintética e calcular as métricas.                                         | Registro de eventos e identidade fictícia.          | Falsos positivos e negativos, orçamento, abandono e custo da defesa. |
+| Componente                    | Responsabilidade                                                                                                   | Entradas                                                              | Saídas                                                                                           |
+|-------------------------------|--------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|
+| Interface web                 | Configurar o experimento, executar rodadas e mostrar resultados.                                                   | Parâmetros e comandos do usuário.                                     | Painéis, tabelas e arquivos CSV.                                                                 |
+| Gerador de cenários           | Criar clientes, contas, pedidos e sinais sintéticos, incluindo compartilhamento legítimo.                          | Sementes, quantidades e parâmetros de comportamento.                  | Dados sintéticos, agenda inicial de ações e rótulos separados para avaliação.                    |
+| Controlador de rodadas        | Ordenar eventos, avançar o tempo simulado, executar ações dos clientes sintéticos e manter o estado entre rodadas. | Agenda, configuração e estado atual.                                  | Chamadas aos componentes e fechamento de cada rodada.                                            |
+| Bot caçador de cupons         | Executar A1 ou A2 e adaptar recursos, ritmo e sinais conforme suas observações.                                    | Estratégia atual, recursos próprios e respostas públicas do checkout. | Cadastros, tentativas de resgate, contestações e mudanças de estratégia.                         |
+| Cadastro e checkout do PedeJá | Representar PE1 e PE2: aplicar as regras do cupom e concluir pedidos.                                              | Dados da conta, pedido, orçamento e decisão do motor.                 | Resposta pública, estado do pedido e resgate concluído.                                          |
+| Motor antifraude              | Escolher B1/B2, analisar relações e sondagem, aplicar limites, intervalos e mensagens e adaptar a política.        | Eventos operacionais observáveis e regras vigentes.                   | Aprovação, recusa, verificação extra ou espera; motivo interno.                                  |
+| Revisão de contestações       | Reavaliar recusas com evidência simulada adicional, sem consultar os rótulos do avaliador.                         | Contestação, histórico e evidência apresentada.                       | Decisão mantida, revertida ou inconclusiva; custo e atraso.                                      |
+| Registro de eventos           | Guardar ações, decisões, custos e mudanças em ordem temporal, separando informações por destinatário.              | Eventos dos demais componentes.                                       | Histórico operacional interno, respostas públicas por conta e registros exclusivos de avaliação. |
+| Avaliador                     | Comparar decisões e resgates com a identidade sintética e calcular métricas.                                       | Eventos, custos e rótulos sintéticos.                                 | Falsos positivos e negativos, abuso aceito, orçamento, abandono e custos.                        |
+
+**Fluxo principal:** o controlador executa uma ação; o cadastro ou checkout consulta o motor; a resposta pública retorna
+ao participante; os eventos são registrados; o orçamento é debitado apenas se houver conclusão do pedido com desconto.
+Uma recusa pode gerar contestação. Ao final da rodada, cada agente adapta suas regras usando apenas as informações
+disponíveis para ele.
+
+A reversão de uma recusa permite uma nova avaliação do checkout, mas não registra um resgate automaticamente. As regras
+de primeira compra, valor do pedido e disponibilidade de orçamento continuam sendo verificadas.
 
 ### 6.3 Eventos registrados (observabilidade)
 
 Todo evento grava a rodada, o instante simulado, as entidades envolvidas e a versão da política. Nas decisões sobre o
-cupom, o **resultado público** (o que o bot vê) fica separado do **motivo interno**. Os eventos abaixo permitem ao motor
-observar e se adaptar, e alimentam as métricas da seção 5.
+cupom, o **resultado público** fica separado do **motivo interno**.
 
-| Evento                                             | Dados principais                                                                           | Métrica da seção 5                                    | Adaptação do motor que dispara                                                                   |
-|----------------------------------------------------|--------------------------------------------------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------------------------------------------------|
-| `cadastro_iniciado` / `_concluido` / `_abandonado` | Conta e sinais apresentados.                                                               | Conclusão de cadastros; concentração de sinais (AM1). | Pico de cadastros com sinais repetidos: exigir B2 nas combinações suspeitas.                     |
-| `relacao_detectada`                                | Contas ligadas por sinal repetido (telefone, CPF, dispositivo ou endereço) e quais sinais. | Relações entre contas (AM2).                          | Combinação suspeita: exigir B2 ou encaminhar à revisão. Compartilhamento isolado não basta (P3). |
-| `verificacao_solicitada` / `_concluida`            | B1/B2, tipo, resultado e custo.                                                            | Abandono após B2; custo da defesa.                    | Abandono alto após B2: reduzir exigências para quem não tem indícios.                            |
-| `pedido_iniciado` / `_concluido` / `_abandonado`   | Pedido, valor e uso do cupom.                                                              | Conclusão de pedidos.                                 | Queda de conversão: reavaliar o rigor das regras.                                                |
-| `cupom_decidido`                                   | Tentativa, resultado público e motivo interno.                                             | Tentativas sucessivas (AM3).                          | Sequência em que só um sinal muda: mensagens genéricas e intervalos progressivos.                |
-| `limite_acionado` / `intervalo_imposto`            | Escopo, janela e próxima tentativa permitida.                                              | Acionamento de limites e intervalos.                  | Muitos clientes legítimos atrasados: revisar limiares.                                           |
-| `resgate_concluido`                                | Pedido, desconto e saldo restante.                                                         | Quantidade, valor e velocidade dos resgates.          | Alimenta o alerta de orçamento.                                                                  |
-| `alerta_orcamento`                                 | Valor, janela e condição acionada.                                                         | Alertas de consumo.                                   | Intensificar a análise das combinações suspeitas, sem recusa coletiva.                           |
-| `contestacao_aberta` / `_resolvida`                | Decisão original, resultado, tempo e custo.                                                | Tempo de revisão; decisões revertidas.                | Aumento de reversões: revisar as regras de compartilhamento.                                     |
-| `politica_alterada`                                | Versão anterior e nova, e as métricas que motivaram a mudança.                             | Adaptação do defensor.                                | Registro da mudança.                                                                             |
-| `estrategia_bot_alterada`                          | Estratégia anterior e nova, e a resposta que motivou.                                      | Adaptação do adversário.                              | Registro, visível só ao avaliador.                                                               |
+Os gatilhos abaixo são propostas configuráveis para o modo adaptativo. Não representam mudanças obrigatórias a cada
+ocorrência.
 
-O bot reage apenas às respostas públicas: aceitação frequente mantém a tática; um novo pedido de verificação leva a
-novos sinais (AM2); mensagem detalhada permite trocar o sinal recusado (AM3); mensagem genérica ou espera levam a testar
-outras combinações ou espaçar as tentativas.
+| Evento                                                           | Dados principais                                                             | Métrica relacionada                                          | Uso na observação ou adaptação                                                                                     |
+|------------------------------------------------------------------|------------------------------------------------------------------------------|--------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------|
+| `cadastro_iniciado`, `cadastro_concluido`, `cadastro_abandonado` | Conta, sinais apresentados e etapa alcançada.                                | Conclusão de cadastros; concentração de sinais (**AM1**).    | Pico de cadastros com combinações suspeitas pode levar à exigência de B2.                                          |
+| `relacao_detectada`                                              | Contas relacionadas e sinais compartilhados.                                 | Relações entre contas (**AM2**).                             | Evidência combinada pode levar à verificação ou revisão. Compartilhamento isolado não basta (**P3**).              |
+| `verificacao_solicitada`, `verificacao_concluida`                | B1/B2, tipo, resultado e custo.                                              | Abandono após B2; custo da defesa.                           | Abandono elevado pode motivar revisão das exigências, em conjunto com os indícios de abuso.                        |
+| `pedido_iniciado`, `pedido_concluido`, `pedido_abandonado`       | Pedido, valor, etapa e uso do cupom.                                         | Conclusão de pedidos; abandono após verificação ou espera.   | Queda de conversão pode motivar reavaliação do rigor das regras.                                                   |
+| `cupom_decidido`                                                 | Tentativa, resultado público, mensagem e motivo interno.                     | Aprovação, recusa e sequências de tentativas (**AM3**).      | Alimenta a análise temporal das respostas e das alterações de sinais.                                              |
+| `sondagem_suspeita_detectada`                                    | Tentativas relacionadas, sinais alterados, janela temporal e regra acionada. | Frequência de padrões suspeitos de sondagem (**AM3**).       | Pode acionar limites, intervalos, recusa do conjunto relacionado ou revisão, conforme a evidência.                 |
+| `limite_acionado`, `intervalo_imposto`                           | Escopo, janela e instante da próxima tentativa permitida.                    | Acionamento de limites e intervalos.                         | Aumento de contestações, reversões e abandono após esses controles pode motivar revisão dos limiares.              |
+| `resgate_concluido`                                              | Conta, pedido, desconto e saldo restante.                                    | Quantidade, valor e velocidade dos resgates.                 | Alimenta o acompanhamento do orçamento e seus alertas.                                                             |
+| `alerta_orcamento`                                               | Valor consumido, janela e condição acionada.                                 | Alertas de consumo.                                          | Pode intensificar a análise das combinações suspeitas, sem recusa coletiva automática.                             |
+| `contestacao_aberta`, `contestacao_resolvida`                    | Decisão original, evidência simulada, resultado, tempo e custo.              | Tempo de revisão; decisões revertidas; custo do atendimento. | Aumento de reversões pode motivar revisão das regras que originaram as recusas.                                    |
+| `politica_alterada`                                              | Versões anterior e nova, métricas e gatilho da mudança.                      | Adaptação do defensor.                                       | Documenta por que o motor alterou a política.                                                                      |
+| `estrategia_bot_alterada`                                        | Estratégias anterior e nova e observações que motivaram a mudança.           | Adaptação do adversário.                                     | Registro exclusivo de avaliação, indisponível ao motor.                                                            |
+| `custo_bot_registrado`                                           | Recurso empregado, tentativa associada e custo.                              | Custo por resgate obtido; benefício líquido do desconto.     | Permite ao avaliador contabilizar tentativas bem-sucedidas e frustradas sem dupla contagem. Indisponível ao motor. |
 
-O motor recebe só os eventos operacionais do PedeJá. A estratégia do bot, suas despesas e a identidade sintética ficam
-fora da entrada dele e servem apenas à avaliação, o que permite conferir se cada adaptação se baseou em informação
-realmente disponível naquele momento.
+O bot reage às respostas públicas: aceitação frequente pode manter a tática; novos pedidos de verificação podem levar à
+substituição de sinais (**AM2**); mensagens detalhadas permitem sondagem direcionada (**AM3**); mensagens genéricas e
+espera podem levar a outras combinações ou ao espaçamento das tentativas. Essas mudanças obedecem a regras e custos
+configurados.
+
+O motor recebe somente eventos operacionais do PedeJá. Um evento de sondagem indica **suspeita**, não confirmação de
+fraude. Contestações e reversões também são sinais imperfeitos: o motor não sabe diretamente quantos clientes legítimos
+foram afetados.
+
+O avaliador utiliza os rótulos sintéticos para medir os erros e o abuso aceito, distinguindo decisões iniciais das
+decisões após contestação. Esses resultados aparecem no painel de avaliação, mas não são enviados automaticamente ao
+motor.
+
+O risco residual **2 × 2 = 4** será apresentado como a estimativa qualitativa das seções 4.5 e 5.2. As métricas do
+experimento servirão para discutir essa estimativa, sem tratá-la como um resultado numérico produzido automaticamente
+pela simulação.
 
 ### 6.4 Estrutura do projeto
 
-Organização proposta das pastas e arquivos do simulador. Cada módulo corresponde a um componente de 6.2.
+Organização proposta das pastas e arquivos do simulador:
 
-```
+```text
 pedeja-simulador/
-├── app.py                      # Interface web (Streamlit): `streamlit run app.py`
+├── app.py                      # Interface web: streamlit run app.py
 ├── requirements.txt            # streamlit, pandas
-├── README.md                   # como instalar e executar
+├── README.md                   # Instalação, execução e descrição dos experimentos
 ├── config/
-│   └── cenarios.json           # rodadas, orçamento, limiares, sementes e modo (guiado/adaptativo)
+│   └── cenarios.json           # Rodadas, orçamento, limiares, custos, sementes e modos
 ├── simulador/
 │   ├── modelos.py              # Conta, Pedido, Tentativa, Decisão, Resgate, Política, Evento
-│   ├── cenarios.py             # Gerador de cenários (dados sintéticos e agenda de ações)
-│   ├── rodadas.py              # Controlador de rodadas (relógio simulado e estado)
-│   ├── checkout.py             # Cadastro e checkout do PedeJá (PE1 e PE2, regras do cupom)
-│   ├── eventos.py              # Registro de eventos (histórico público e interno)
+│   ├── cenarios.py             # Dados sintéticos, comportamento dos clientes e agenda
+│   ├── rodadas.py              # Relógio simulado, execução de ações e estado
+│   ├── checkout.py             # PE1 e PE2, regras do cupom e conclusão dos pedidos
+│   ├── eventos.py              # Eventos e separação das informações por destinatário
 │   ├── agentes/
-│   │   ├── bot.py              # Bot caçador de cupons (A1/A2 e regras de adaptação)
-│   │   ├── motor.py            # Motor antifraude (B1/B2, limites, intervalos, mensagens)
-│   │   └── revisao.py          # Revisão de contestações
+│   │   ├── bot.py              # A1/A2 e regras de adaptação
+│   │   ├── motor.py            # B1/B2, relações, sondagem, limites e mensagens
+│   │   └── revisao.py          # Revisão de contestações com evidência simulada
 │   └── avaliacao/
-│       └── metricas.py         # Avaliador (falsos positivos/negativos, orçamento, custo)
+│       └── metricas.py         # Erros, orçamento, custos e resultados do bot
 ├── tests/
-│   ├── test_regras_cupom.py    # mínimo de R$ 30, primeira compra, um resgate por pedido
-│   ├── test_agentes.py         # adaptações do bot e do motor por gatilho
-│   └── test_metricas.py        # cálculo das métricas da seção 5
-└── saidas/                     # CSV exportados (fora do controle de versão)
+│   ├── test_regras_cupom.py    # Valor > R$ 30, primeira compra e débito único
+│   ├── test_agentes.py         # Adaptações por gatilho e manutenção de estado
+│   ├── test_controles_am3.py   # Mensagens, limites, sondagem e contestação
+│   ├── test_separacao.py       # Informações disponíveis para cada agente
+│   └── test_metricas.py        # Métricas e custos sem dupla contagem
+└── saidas/                    # CSV exportados, fora do controle de versão
 ```
 
 **Regras de dependência:** `app.py` chama `rodadas.py`, que coordena `checkout.py` e os agentes. O bot e o motor recebem
-somente as entradas descritas em 6.2 e nunca importam `avaliacao/`. A ligação entre pessoa sintética e conta é mantida
-em uma estrutura separada, acessível apenas ao gerador de cenários e ao avaliador. As entradas dos agentes excluem essa
-ligação e os rótulos de legitimidade ou fraude; o motor também não recebe a estratégia nem as despesas do bot. Testes
-verificam essa separação de informação. Os parâmetros das regras, limiares, custos e probabilidades ficam em
-`config/cenarios.json`; a lógica que os utiliza permanece nos módulos do simulador.
+somente as entradas descritas em 6.2 e nunca importam `avaliacao/`.
+
+A ligação entre pessoa sintética e conta fica em uma estrutura separada, acessível ao gerador e ao avaliador. As
+entradas do motor e da revisão excluem essa ligação e os rótulos de legitimidade ou fraude. O motor também não recebe a
+estratégia nem as despesas do bot.
+
+Os parâmetros ficam em `config/cenarios.json`; a lógica permanece nos módulos. O limite inicial de **3 tentativas em 24
+horas simuladas** será configurável, assim como os intervalos progressivos e as condições para detectar sondagem.
+
+Os testes verificarão as regras do cupom, a persistência do histórico entre rodadas, os quatro controles da AM3 e a
+separação de informação. Para o valor do pedido, serão incluídos os casos R\$ 30,00, sem elegibilidade, e R\$ 30,01,
+elegível quanto ao valor, respeitando a regra “acima de R\$ 30”.
 
 ---
 
@@ -660,14 +748,14 @@ Ver [`fontes/referencias.md`](fontes/referencias.md).
 
 _[Texto introdutório — Guilherme.]_
 
-| Integrante                               | Ferramenta | Tarefa em que foi utilizada | Como o conteúdo foi verificado |
-|------------------------------------------|------------|-----------------------------|--------------------------------|
-| Ariessa Velasques Oliveira               |            |                             |                                |
-| Maria Eduarda Sanchez Chessio            |            |                             |                                |
-| Mirieli Rodrigues dos Santos de Oliveira |            |                             |                                |
-| Vitoria Pereira Garcia                   |            |                             |                                |
-| Guilherme Jaques                         |            |                             |                                |
-| Eduardo Dutra Ferreira                   |            |                             |                                |
+| Integrante                               | Ferramenta           | Tarefa em que foi utilizada                                                                            | Como o conteúdo foi verificado                                                              |
+|------------------------------------------|----------------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+| Ariessa Velasques Oliveira               |                      |                                                                                                        |                                                                                             |
+| Maria Eduarda Sanchez Chessio            |                      |                                                                                                        |                                                                                             |
+| Mirieli Rodrigues dos Santos de Oliveira |                      |                                                                                                        |                                                                                             |
+| Vitoria Pereira Garcia                   |                      |                                                                                                        |                                                                                             |
+| Guilherme Jaques                         |                      |                                                                                                        |                                                                                             |
+| Eduardo Dutra Ferreira                   | ChatGPT e NotebookLM | Apoio à pesquisa, esclarecimento de dúvidas, revisão textual e estruturação do arquivo Markdown (.md). | Revisão manual do conteúdo e conferência de sua coerência com as demais seções do trabalho. |
 
 ---
 
