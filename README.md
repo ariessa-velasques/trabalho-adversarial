@@ -266,13 +266,17 @@ Fonte editável: [`diagramas/ciclo-adaptativo.mmd`](diagramas/ciclo-adaptativo.m
 
 > Responsável: **Maria Eduarda**
 
+Esta seção parte dos pressupostos **P1–P3** (seção 1.3) e das rodadas da seção 3 para mostrar **onde** o bot caçador de cupons consegue explorar o PedeJá, **o que** pode dar errado em cada ponto e **qual ameaça tem prioridade**. A cadeia usada é a da disciplina: o **ativo** (o que tem valor) sofre uma **ameaça** (o que de ruim pode acontecer), que só se concretiza porque existe uma **fraqueza** ou um **pressuposto que falha** (a vulnerabilidade), explorada por meio de um **ponto de exploração** (por onde o bot entra).
+
 ### 4.1 Pontos de exploração
 
 | ID | Ponto de exploração | Tipo (interface, regra, componente, fluxo) | Descrição |
 |-|-|-|-|
-| PE1 | Formulário de cadastro | Interface | _[detalhar]_ |
-| PE2 | Regra de elegibilidade do cupom | Regra | |
-| PE3 | Mensagens de recusa/verificação | Fluxo | |
+| PE1 | Formulário de cadastro de conta (e verificação de telefone/CPF na verificação rígida) | Interface | Tela e endpoint de criação de conta. Na **verificação leve (B1)** pede só e-mail e senha; na **verificação rígida (B2)** pede também código por SMS, CPF e coleta o identificador do dispositivo. É a **porta de entrada das multicontas**: tudo o que o motor antifraude sabe sobre uma conta nasce aqui, e o bot controla todos os dados que digita. Pode ser chamado em lote por um script, sem passar pelo app. |
+| PE2 | Regra de elegibilidade do cupom no checkout ("uma vez por conta") | Regra | Regra que decide se o `BEMVINDO` vale para o pedido: conta sem pedido anterior + pedido acima de R$ 30. Ela confere **contas**, não **pessoas** (P1). Por isso cada conta nova aceita no PE1 vira automaticamente um resgate de R$ 20, e o ganho do bot cresce junto com o número de contas. |
+| PE3 | Mensagens de recusa e de pedido de verificação exibidas no checkout | Fluxo / resposta observável | Resposta que o checkout devolve a cada tentativa: cupom aceito, recusado com motivo ("este CPF já foi usado", "este dispositivo já resgatou o cupom") ou pedido de verificação extra. Foi pensada para ajudar o cliente legítimo a entender a recusa, mas é a **principal fonte de informação do bot**: cada mensagem diz qual sinal de identidade foi detectado (rodadas 2 e 3 da seção 3). |
+
+Os três pontos formam uma sequência: o bot **entra** pelo PE1, **lucra** pelo PE2 e **aprende** pelo PE3, usando o que aprendeu para voltar ao PE1 com contas melhores.
 
 ### 4.2 Diagrama de superfície de ataque
 
