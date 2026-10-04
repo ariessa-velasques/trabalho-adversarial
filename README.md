@@ -625,7 +625,22 @@ Ver [`fontes/referencias.md`](fontes/referencias.md).
 > Responsável pelo texto: **Guilherme**. **Cada integrante preenche a própria linha** no seu próprio commit (se não usou
 > IA, escreva "não utilizou").
 
-_[Texto introdutório — Guilherme.]_
+O grupo declara o uso de ferramentas de IA generativa na elaboração deste trabalho, conforme exigido no enunciado. O uso
+não é proibido, mas deve ser informado: a tabela abaixo indica, **para cada integrante**, qual ferramenta foi usada, em
+qual tarefa e como o conteúdo foi verificado.
+ 
+Critérios adotados pelo grupo:
+ 
+- **A IA não substitui a decisão do grupo.** O sistema, a interação, os atores, as ações do jogo, os IDs P1–P3, PE1–PE3
+  e AM1–AM3 e os valores hipotéticos foram definidos em reunião (Ficha do sistema, seção 0).
+- **Todo conteúdo produzido com IA foi lido e conferido pelo integrante responsável**, comparando-o com a Ficha, com as
+  demais seções do README (nomes, IDs e valores) e com as referências citadas.
+- **Referências sugeridas por IA foram checadas na fonte original** antes de entrar em `fontes/referencias.md`; fonte que
+  não pôde ser confirmada foi removida.
+- **Todos os integrantes devem conseguir explicar qualquer parte do relatório**, inclusive as escritas com apoio de IA,
+  e respondem por ela.
+- Nenhum dado real de usuários ou de plataformas foi enviado a ferramentas de IA; o PedeJá é hipotético e os valores são
+  sintéticos.
 
 | Integrante                               | Ferramenta | Tarefa em que foi utilizada | Como o conteúdo foi verificado |
 |------------------------------------------|------------|-----------------------------|--------------------------------|
