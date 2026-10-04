@@ -290,9 +290,13 @@ Fonte editável: [`diagramas/superficie-de-ataque.mmd`](diagramas/superficie-de-
 
 > Um **[ator]** pode realizar **[ação]** por meio de **[ponto de exploração]**, aproveitando **[fraqueza ou pressuposto]**, causando **[impacto]** sobre **[ativo ou propriedade]**.
 
-- **AM1:**
-- **AM2:**
-- **AM3:**
+- **AM1 — Multicontas com e-mails descartáveis.** Um **bot caçador de cupons** pode **criar contas em massa com e-mails descartáveis e variações `nome+N@...` e resgatar o `BEMVINDO` uma vez em cada uma** por meio do **formulário de cadastro (PE1) e da regra de elegibilidade "uma vez por conta" (PE2)**, aproveitando **o pressuposto P1 (cada conta corresponde a uma pessoa real), que na verificação leve é conferido apenas pelo e-mail**, causando **o gasto de R$ 20 por conta falsa sem trazer nenhum cliente novo (≈ R$ 14 de prejuízo líquido por resgate; R$ 4.000 em uma semana na rodada 1)** sobre a **distribuição justa do orçamento de aquisição**.
+
+- **AM2 — Passar pela verificação rígida com sinais comprados.** Um **bot caçador de cupons** pode **completar a verificação rígida usando números virtuais de SMS, CPFs vazados de terceiros e um emulador que gera um novo identificador de dispositivo a cada conta** por meio do **formulário de cadastro com verificação de telefone e CPF (PE1)**, aproveitando **o pressuposto P2 (telefone, CPF e dispositivo são caros ou difíceis de obter em quantidade), que falha porque o custo por conta (c ≈ R$ 5) continua menor que os R$ 20 do desconto**, causando **resgates fraudulentos mesmo com a defesa mais forte ativa, cadastros feitos em nome de pessoas que nem usam o app e a perda do atrito que a B2 já cobrou dos clientes legítimos (conversão 70% → 55%) sem o benefício esperado** sobre o **orçamento de aquisição, a confiança nos dados de cadastro e a privacidade dos titulares dos CPFs**.
+
+- **AM3 — Sondagem das mensagens de recusa.** Um **bot caçador de cupons** pode **sondar o motor antifraude trocando um sinal de identidade por tentativa (dispositivo, depois endereço do vizinho ou da portaria) e ler a mensagem de recusa até descobrir qual sinal o denunciou** por meio das **mensagens de recusa e de pedido de verificação do checkout (PE3)**, aproveitando **a fraqueza das mensagens detalhadas ("este CPF já foi usado", "este dispositivo já resgatou o cupom") e o pressuposto P3 (mesmo dispositivo ou endereço indica a mesma pessoa), que o bot contorna variando exatamente o sinal indicado**, causando **a perda de eficácia de cada nova regra do motor (o bot aprende a contorná-la em poucas tentativas) e, como reação, regras mais duras por dispositivo e endereço que recusam famílias e repúblicas (falsos positivos)** sobre a **distribuição justa do orçamento de aquisição e a experiência de cadastro do cliente legítimo**.
+
+As três ameaças são **a mesma intenção em momentos diferentes da corrida** (seção 3): AM1 acontece enquanto o motor está em B1; AM2 é a resposta do bot à mudança para B2; AM3 é a resposta do bot à forma como o motor comunica as recusas. Nenhuma delas é um erro ou acidente: todas dependem de um agente que observa a resposta e muda a ação.
 
 ### 4.4 Avaliação de riscos
 
