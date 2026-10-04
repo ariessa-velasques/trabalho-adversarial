@@ -613,7 +613,19 @@ _[Responder para o PedeJá: depois da última resposta do motor antifraude (seç
 As definições abaixo são curtas e cada uma é ligada ao caso do **PedeJá**. Os números entre colchetes remetem a
 [`fontes/referencias.md`](fontes/referencias.md).
 
-
+### 8.1 Teoria dos jogos
+ 
+| Conceito                     | Definição                                                                                                                                                                                      | No PedeJá                                                                                                                                  |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| **Sistema adversarial**      | Sistema em que participantes com objetivos total ou parcialmente conflitantes tomam decisões e adaptam o comportamento ao que observam do outro [4][14].                                       | Bot e motor antifraude disputam o orçamento do `BEMVINDO`: o que um ganha, o outro perde.                                                  |
+| **Jogo**                     | Situação em que cada jogador escolhe uma ação e o resultado de cada um depende das escolhas de todos [1][2].                                                                                   | Jogo 2×2: A1/A2 (bot) × B1/B2 (motor).                                                                                                     |
+| **Payoff**                   | Valor que representa o quanto um jogador prefere um resultado. Em jogos simples, basta a **ordem de preferência** (por exemplo, 0 a 3) [1].                                                    | Cada célula da matriz traz `(payoff do bot, payoff do motor)`, justificado pelos custos da seção 1.                                         |
+| **Melhor resposta**          | Ação que dá o maior payoff a um jogador, dada a ação escolhida pelo outro [1].                                                                                                                 | Dado B1, qual é a melhor ação do bot? E dado B2? (seção 2.3)                                                                               |
+| **Estratégia dominante**     | Ação que é melhor resposta **qualquer que seja** a ação do outro jogador [1][2]. Não é obrigatório que exista.                                                                                 | Verificada na seção 2.4.                                                                                                                   |
+| **Equilíbrio de Nash**       | Combinação de ações em que nenhum jogador melhora mudando **sozinho** [3][1]. Não significa que o resultado seja bom para o sistema nem para os usuários.                                       | Resultado estável da matriz; avaliamos se é bom para o cliente legítimo (seção 2.6).                                                       |
+| **Jogo repetido**            | Mesmo jogo jogado em várias rodadas, em que as escolhas passadas são observadas e podem condicionar as seguintes [1][2][5].                                                                    | As 3 rodadas da seção 3: o motor só passa a B2 depois de observar o pico de cadastros da rodada 1.                                         |
+| **Corrida armamentista**     | Escalada em que cada lado responde ao último movimento do outro com um movimento mais caro, em um ciclo de adaptação mútua. O termo vem da biologia evolutiva [6] e é usado em segurança [9][10]. | Verificação rígida → números virtuais → sondagem → mensagem genérica → testes distribuídos. Termina para o bot quando c ≥ R$ 20.            |
+ 
 
 ---
 
