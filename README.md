@@ -326,14 +326,38 @@ As notas consideram o PedeJá **como descrito na seção 3**: começa na verific
 
 O **empate entre AM1 e AM2 (risco 6)** é desfeito pela ordem das rodadas: o AM1 é tratado primeiro porque é o mais barato para o bot e o mais fácil de detectar (basta sair de B1). O AM2 exige medidas mais caras e só aparece depois disso.
 
-### 4.5 Ameaça prioritária: _[ID]_
+### 4.5 Ameaça prioritária: AM3 — sondagem das mensagens de recusa (risco 9)
+
+O AM3 é a prioridade porque tem o maior risco e porque é ele que dá ao bot a capacidade de **se adaptar rápido**: enquanto as mensagens contarem qual sinal foi detectado, qualquer defesa contra AM1 e AM2 dura poucas tentativas. A resposta abaixo é a mesma adaptação do motor no fim da rodada 3 (seção 3), detalhada aqui. Os controles de cada ameaça estão na seção 5.
 
 1. **Como o sistema poderia responder:**
+   - trocar todas as mensagens de recusa por **uma única mensagem genérica** ("Não foi possível aplicar o cupom neste pedido"), sem dizer qual sinal causou a recusa. O motivo real fica **só no registro interno** do motor;
+   - **limitar as tentativas de resgate** por dispositivo, sessão e cartão (por exemplo, 3 tentativas em 24 h). Depois disso, o cupom deixa de ser oferecido naquela sessão;
+   - **detectar o padrão de sondagem**: uma sequência de contas ou tentativas em que só um campo muda (dispositivo, endereço) passa a ser recusada em conjunto, e não uma por uma;
+   - criar um **canal de contestação** para quem for recusado (por exemplo, enviar um comprovante de endereço ou falar com o suporte), para que o cliente legítimo não fique sem saída.
 2. **Que informação essa resposta revelaria:**
+   - o bot continua vendo o **resultado binário** (aceito ou recusado). Ainda dá para aprender por tentativa e erro, só que mais devagar e mais caro;
+   - a **troca repentina** da mensagem detalhada pela genérica mostra ao bot que **a sondagem foi percebida**;
+   - o limite de tentativas pode ser descoberto: se a 4ª tentativa do mesmo aparelho sempre falha, o bot conclui que o limite é 3;
+   - o canal de contestação mostra **que tipo de prova o PedeJá aceita** para reverter uma recusa.
 3. **Como o adversário se adaptaria na rodada seguinte:**
+   - **espalhar as tentativas** por muitos dispositivos emulados e sessões, ficando abaixo do limite em cada um;
+   - trocar **vários sinais ao mesmo tempo** e inferir a regra pela **taxa de aceitação de lotes** de contas (testa 50 contas com endereço variado e 50 sem, e compara), em vez de ler a mensagem;
+   - tentar **abusar do canal de contestação** com comprovantes falsos ou de terceiros;
+   - com isso o custo por resgate sobe (c ≈ R$ 8 ou mais), mas continua abaixo de R$ 20. Por isso o bot não desiste, o que leva de volta à corrida armamentista da seção 3.2.
 4. **Efeitos colaterais sobre usuários legítimos:**
+   - o cliente recusado **não sabe o motivo** (por exemplo, alguém da família já usou o cupom no mesmo endereço) e não consegue corrigir sozinho. Isso gera mais chamados no suporte e mais desistências;
+   - o limite de tentativas pune quem **erra a digitação** do CPF ou do telefone algumas vezes;
+   - a contestação é **mais um passo**: o cliente espera a análise ou faz o primeiro pedido sem desconto, justamente na compra que o cupom deveria facilitar.
 5. **Risco que continua existindo após a resposta:**
+   - a sondagem não acaba, só fica mais lenta e cara. A probabilidade do AM3 cai de 3 para 2 (o bot precisa de muitos dispositivos e sessões para aprender) e o impacto cai de 3 para 2 (o bot não descobre mais qual regra pegou cada conta). **Risco residual estimado: 2 × 2 = 4**;
+   - o **AM2 não é afetado** pela mensagem genérica: enquanto números de SMS, CPFs e emulador custarem menos que R$ 20 por conta, ainda há resgates fraudulentos;
+   - os **falsos positivos do P3** (aparelho e endereço compartilhados) continuam. A contestação só reduz o dano depois que ele aconteceu.
 6. **O que o sistema precisa continuar preservando:**
+   - **um cupom por pessoa real**: a distribuição justa do orçamento de aquisição continua sendo o objetivo, e nenhuma resposta pode ser "liberar tudo" só para reduzir reclamações;
+   - **um caminho para o cliente legítimo**: atrito baixo no cadastro e sempre uma forma de contestar a recusa, sem ficar bloqueado sem explicação;
+   - **o mínimo de dados pessoais** (LGPD): endurecer a defesa não justifica coletar mais dados do que o necessário para verificar a identidade;
+   - **a capacidade do motor de observar**: o motivo real de cada recusa e as tentativas de sondagem precisam continuar registrados internamente, porque são esses dados que permitem ao motor se adaptar na rodada seguinte (seções 5 e 6).
 
 ---
 
