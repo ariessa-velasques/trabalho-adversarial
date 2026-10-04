@@ -378,7 +378,7 @@ _[Texto introdutório — Guilherme.]_
 | Integrante | Ferramenta | Tarefa em que foi utilizada | Como o conteúdo foi verificado |
 |-|-|-|-|
 | Ariessa Velasques Oliveira | | | |
-| Maria Eduarda Sanchez Chessio | | | |
+| Maria Eduarda Sanchez Chessio | Claude (Anthropic) | Rascunho da seção 4 (pontos de exploração, cenários de ameaça, critérios e tabela de risco, ameaça prioritária) e do diagrama de superfície de ataque; apoio na revisão de consistência | Conferi cada ameaça, ponto de exploração e pressuposto contra a Ficha (seção 0) e as seções 1 e 3; revisei as notas de probabilidade e impacto com base nos custos e valores da seção 3; validei o diagrama no Mermaid; li e ajustei o texto antes de cada commit |
 | Mirieli Rodrigues dos Santos de Oliveira | | | |
 | Vitoria Pereira Garcia | | | |
 | Guilherme Jaques | | | |
