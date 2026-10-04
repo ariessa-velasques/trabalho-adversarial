@@ -284,6 +284,8 @@ Os três pontos formam uma sequência: o bot **entra** pelo PE1, **lucra** pelo 
 
 Fonte editável: [`diagramas/superficie-de-ataque.mmd`](diagramas/superficie-de-ataque.mmd)
 
+**Como ler o diagrama:** à esquerda está o **bot caçador de cupons** com os **insumos** que compra ou gera fora do PedeJá (e-mails, números de SMS, CPFs, emulador, endereços). No centro estão os três **pontos de exploração** (laranja) e os componentes internos que eles alimentam (azul): a base de contas e o **motor antifraude**. As setas grossas mostram o ciclo do bot (**1.** cria contas no PE1 → **2.** aplica o cupom no PE2 → **3.** lê a resposta no PE3 e volta ao passo 1). As setas tracejadas ligam cada ponto ao **ativo** (verde) que a ameaça atinge, com o ID da ameaça e do pressuposto. O **cliente novo legítimo** usa as mesmas interfaces que o bot; por isso toda defesa colocada nelas também o afeta.
+
 ### 4.3 Cenários de ameaça
 
 > Um **[ator]** pode realizar **[ação]** por meio de **[ponto de exploração]**, aproveitando **[fraqueza ou pressuposto]**, causando **[impacto]** sobre **[ativo ou propriedade]**.
