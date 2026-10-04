@@ -626,7 +626,20 @@ As definições abaixo são curtas e cada uma é ligada ao caso do **PedeJá**. 
 | **Jogo repetido**            | Mesmo jogo jogado em várias rodadas, em que as escolhas passadas são observadas e podem condicionar as seguintes [1][2][5].                                                                    | As 3 rodadas da seção 3: o motor só passa a B2 depois de observar o pico de cadastros da rodada 1.                                         |
 | **Corrida armamentista**     | Escalada em que cada lado responde ao último movimento do outro com um movimento mais caro, em um ciclo de adaptação mútua. O termo vem da biologia evolutiva [6] e é usado em segurança [9][10]. | Verificação rígida → números virtuais → sondagem → mensagem genérica → testes distribuídos. Termina para o bot quando c ≥ R$ 20.            |
  
-
+### 8.2 Segurança e análise de ameaças
+ 
+| Conceito                 | Definição                                                                                                                                                  | No PedeJá                                                                                                  |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| **Ativo**                | Aquilo que tem valor e precisa ser protegido: um recurso ou uma propriedade como confiança, privacidade, disponibilidade ou justiça [8][9].                | Distribuição justa do orçamento de aquisição (um desconto por pessoa real).                                |
+| **Superfície de ataque** | Conjunto de pontos (interfaces, regras, fluxos, recursos) pelos quais um adversário pode tentar interagir com o sistema ou extrair algo dele [7].          | PE1 (cadastro), PE2 (regra de elegibilidade), PE3 (mensagens de recusa).                                   |
+| **Vulnerabilidade**      | Fraqueza do sistema, de um controle ou de um pressuposto que pode ser explorada [11].                                                                      | A regra "um cupom por conta" pressupõe 1 conta = 1 pessoa (P1).                                            |
+| **Ameaça**               | Circunstância ou evento com potencial de causar impacto negativo sobre um ativo, por exemplo, um ator que explora uma vulnerabilidade [11][8].             | AM1, AM2 e AM3: cenários no formato "ator, ação, ponto de exploração, fraqueza, impacto, ativo".           |
+| **Ataque**               | Ação concreta de um adversário que tenta explorar a vulnerabilidade [9].                                                                                   | Criar ≈ 200 contas com e-mails descartáveis e resgatar o cupom em cada uma (rodada 1).                     |
+| **Caso de abuso**        | Descrição de uma interação em que o sistema é usado de forma legítima na aparência, mas com intenção de causar dano [13][12].                              | Cada cadastro e cada resgate são funcionalidades normais; o abuso está em usá-las em massa.                |
+| **Impacto**              | Consequência da ameaça concretizada sobre o ativo [11].                                                                                                    | R$ 4.000 do orçamento (4%) em ≈ 200 resgates fraudulentos na rodada 1.                                     |
+| **Risco**                | Função da probabilidade de a ameaça ocorrer e do seu impacto [11]. Neste trabalho: risco = probabilidade × impacto, com escala de 1 a 3.                    | Tabela de risco da seção 4.4.                                                                              |
+| **Risco residual**       | Risco que permanece depois de aplicado um controle [11].                                                                                                   | Ex.: com mensagem genérica, o resultado aceito/recusado ainda informa o bot (seção 5.1).                   |
+ 
 ---
 
 ## 9. Referências
