@@ -300,13 +300,31 @@ As três ameaças são **a mesma intenção em momentos diferentes da corrida** 
 
 ### 4.4 Avaliação de riscos
 
-Probabilidade e impacto: 1 = baixo, 2 = médio, 3 = alto. Risco = probabilidade × impacto.
+Probabilidade e impacto: 1 = baixo, 2 = médio, 3 = alto. Risco = probabilidade × impacto (de 1 a 9).
+
+Para que as notas não fiquem arbitrárias, o grupo usou estes critérios, ligados aos custos do bot e aos ativos da seção 1:
+
+| Nota | Probabilidade (o bot consegue e compensa fazer?) | Impacto (se acontecer, quão ruim é?) |
+|-:|-|-|
+| 1 | Exige recursos raros ou caros; o custo por conta (c) chega perto ou passa de R$ 20 | Perda pontual do orçamento (menos de 1% ao mês), facilmente detectada; nenhum efeito sobre clientes legítimos |
+| 2 | Exige comprar insumos ou montar ferramentas (números, CPFs, emulador), mas c continua bem abaixo de R$ 20 | Perda relevante do orçamento **ou** dano a um ativo secundário (dados de cadastro, conversão), sem anular a defesa |
+| 3 | Custo ≈ zero, ferramentas públicas, automatizável por qualquer script; já aparece nas rodadas da seção 3 | Atinge o ativo principal **e** pelo menos um secundário, **ou** anula a defesa atual do motor (o bot passa a contorná-la sem custo extra) |
+
+As notas consideram o PedeJá **como descrito na seção 3**: começa na verificação leve, passa para a rígida e mantém mensagens de recusa detalhadas.
 
 | ID | Cenário de ameaça | Ponto de exploração | Pressuposto ou fraqueza | Ativo afetado | Probabilidade | Impacto | Risco |
 |-|-|-|-|-|-:|-:|-:|
-| AM1 | | PE1, PE2 | P1 | | | | |
-| AM2 | | PE1 | P2 | | | | |
-| AM3 | | PE3 | P3 / mensagens detalhadas | | | | |
+| AM1 | Bot cria contas em massa com e-mails descartáveis e resgata o `BEMVINDO` em cada uma | PE1, PE2 | P1 — e-mail novo = pessoa nova | Distribuição justa do orçamento de aquisição | 3 | 2 | **6** |
+| AM2 | Bot passa pela verificação rígida com números virtuais, CPFs vazados e emulador | PE1 | P2 — telefone, CPF e dispositivo seriam caros | Orçamento de aquisição; confiança nos dados de cadastro; privacidade dos titulares dos CPFs | 2 | 3 | **6** |
+| AM3 | Bot sonda o motor trocando um sinal por vez e lendo a mensagem de recusa | PE3 | Fraqueza: mensagens de recusa detalhadas; P3 — mesmo dispositivo/endereço = mesma pessoa | Orçamento de aquisição (via perda de eficácia das regras); experiência de cadastro do cliente legítimo | 3 | 3 | **9** |
+
+**Justificativa das notas:**
+
+- **AM1 — probabilidade 3:** e-mails descartáveis e variações `nome+N@` são gratuitos e ilimitados, e um script cria contas em lote (c ≈ R$ 0, rodada 1). **Impacto 2:** o prejuízo é real (R$ 4.000 em uma semana, 4% do orçamento mensal), mas atinge só o orçamento e deixa um rastro fácil de ver (pico de cadastros, poucos domínios, contas sem segunda compra). Foi o que fez o motor reagir já na primeira rodada.
+- **AM2 — probabilidade 2:** o bot precisa comprar números de SMS e CPFs e manter um emulador. Continua lucrativo (c ≈ R$ 5 contra R$ 20 de desconto), mas exige mais esforço e dinheiro que o AM1. **Impacto 3:** derrota a defesa mais forte que o motor tem (B2), cuja conta o cliente legítimo já pagou com a queda de conversão. Além disso, atinge três ativos e envolve dados de terceiros que nem participam da interação.
+- **AM3 — probabilidade 3:** não exige nenhum insumo novo. A mensagem é exibida em toda recusa, e uma única tentativa já revela qual sinal foi detectado (rodada 3). **Impacto 3:** é a ameaça que **anula todas as outras defesas**. Qualquer regra nova do motor (B2, ligação por dispositivo e endereço) é descoberta e contornada em poucas tentativas. E a reação natural do motor (regras mais duras) gera falsos positivos contra famílias e repúblicas.
+
+O **empate entre AM1 e AM2 (risco 6)** é desfeito pela ordem das rodadas: o AM1 é tratado primeiro porque é o mais barato para o bot e o mais fácil de detectar (basta sair de B1). O AM2 exige medidas mais caras e só aparece depois disso.
 
 ### 4.5 Ameaça prioritária: _[ID]_
 
