@@ -648,7 +648,7 @@ Critérios adotados pelo grupo:
 | Maria Eduarda Sanchez Chessio            |            |                             |                                |
 | Mirieli Rodrigues dos Santos de Oliveira |            |                             |                                |
 | Vitoria Pereira Garcia                   |            |                             |                                |
-| Guilherme Jaques                         |            |                             |                                |
+| Guilherme Jaques | Claude (Anthropic) | Rascunho da seção 7 (pergunta final), da seção 8 (fundamentação conceitual), do texto introdutório da seção 10, da lista de fontes/referencias.md e do roteiro da apresentação com a especificação do template (apresentacao/roteiro.md) | Conferi cada seção contra a Ficha (seção 0) e as seções 1, 3 e 5, checando nomes, IDs (P1–P3, PE1–PE3, AM1–AM3) e valores hipotéticos; verifiquei cada referência na fonte original (autor, ano, edição, capítulo e link) e removi as que não consegui confirmar; li e ajustei os textos antes de cada commit; ensaiei a fala sem ler os slides para poder explicar todas as decisões |
 | Eduardo Dutra Ferreira                   |            |                             |                                |
 
 ---
