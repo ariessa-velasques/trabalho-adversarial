@@ -15,5 +15,6 @@
 | 7 | Guilherme | Conclusão: "depois que o sistema responder, o que o outro lado aprenderá?" | | ~1 min |
 
 Links finais:
+- [Template Canva](https://canva.link/hjsbpdxg6orlhrx)
 - PDF dos slides (Google Drive):
 - Vídeo (YouTube):
