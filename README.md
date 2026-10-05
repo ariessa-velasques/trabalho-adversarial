@@ -648,7 +648,7 @@ Critérios adotados pelo grupo:
 | Maria Eduarda Sanchez Chessio            |            |                             |                                |
 | Mirieli Rodrigues dos Santos de Oliveira |            |                             |                                |
 | Vitoria Pereira Garcia                   |            |                             |                                |
-| Guilherme Jaques | Claude (Anthropic) | Rascunho das seções 7, 8, 10 e referencias | Conteudo conferido contra a Ficha (seção 0) e as seções 1, 3 e 5, checando nomes, IDs (P1–P3, PE1–PE3, AM1–AM3) e valores hipotéticos; referências verificadas na fonte original, removendo as que não consegui confirmar; ensaiei a fala sem ler os slides para poder explicar todas as decisões |
+| Guilherme Jaques | Claude (Anthropic) | Rascunho das seções 7, 8, 10 e referencias | Conteudo conferido contra a Ficha (seção 0) e as seções 1, 3 e 5, checando nomes, IDs e valores hipotéticos; referências verificadas na fonte original, removendo as que não puderam ser confirmadas; |
 | Eduardo Dutra Ferreira                   |            |                             |                                |
 
 ---
