@@ -363,13 +363,17 @@ Fonte editável: [`diagramas/ciclo-adaptativo.mmd`](diagramas/ciclo-adaptativo.m
 
 > Responsável: **Maria Eduarda**
 
+Esta seção parte dos pressupostos **P1–P3** (seção 1.3) e das rodadas da seção 3 para mostrar **onde** o bot caçador de cupons consegue explorar o PedeJá, **o que** pode dar errado em cada ponto e **qual ameaça tem prioridade**. A cadeia usada é a da disciplina: o **ativo** (o que tem valor) sofre uma **ameaça** (o que de ruim pode acontecer), que só se concretiza porque existe uma **fraqueza** ou um **pressuposto que falha** (a vulnerabilidade), explorada por meio de um **ponto de exploração** (por onde o bot entra).
+
 ### 4.1 Pontos de exploração
 
-| ID  | Ponto de exploração             | Tipo (interface, regra, componente, fluxo) | Descrição    |
-|-----|---------------------------------|--------------------------------------------|--------------|
-| PE1 | Formulário de cadastro          | Interface                                  | _[detalhar]_ |
-| PE2 | Regra de elegibilidade do cupom | Regra                                      |              |
-| PE3 | Mensagens de recusa/verificação | Fluxo                                      |              |
+| ID | Ponto de exploração | Tipo (interface, regra, componente, fluxo) | Descrição |
+|-|-|-|-|
+| PE1 | Formulário de cadastro de conta (e verificação de telefone/CPF na verificação rígida) | Interface | Tela e endpoint de criação de conta. Na **verificação leve (B1)** pede só e-mail e senha; na **verificação rígida (B2)** pede também código por SMS, CPF e coleta o identificador do dispositivo. É a **porta de entrada das multicontas**: tudo o que o motor antifraude sabe sobre uma conta nasce aqui, e o bot controla todos os dados que digita. Pode ser chamado em lote por um script, sem passar pelo app. |
+| PE2 | Regra de elegibilidade do cupom no checkout ("uma vez por conta") | Regra | Regra que decide se o `BEMVINDO` vale para o pedido: conta sem pedido anterior + pedido acima de R$ 30. Ela confere **contas**, não **pessoas** (P1). Por isso cada conta nova aceita no PE1 vira automaticamente um resgate de R$ 20, e o ganho do bot cresce junto com o número de contas. |
+| PE3 | Mensagens de recusa e de pedido de verificação exibidas no checkout | Fluxo / resposta observável | Resposta que o checkout devolve a cada tentativa: cupom aceito, recusado com motivo ("este CPF já foi usado", "este dispositivo já resgatou o cupom") ou pedido de verificação extra. Foi pensada para ajudar o cliente legítimo a entender a recusa, mas é a **principal fonte de informação do bot**: cada mensagem diz qual sinal de identidade foi detectado (rodadas 2 e 3 da seção 3). |
+
+Os três pontos formam uma sequência: o bot **entra** pelo PE1, **lucra** pelo PE2 e **aprende** pelo PE3, usando o que aprendeu para voltar ao PE1 com contas melhores.
 
 ### 4.2 Diagrama de superfície de ataque
 
@@ -377,33 +381,81 @@ Fonte editável: [`diagramas/ciclo-adaptativo.mmd`](diagramas/ciclo-adaptativo.m
 
 Fonte editável: [`diagramas/superficie-de-ataque.mmd`](diagramas/superficie-de-ataque.mmd)
 
+**Como ler o diagrama:** à esquerda está o **bot caçador de cupons** com os **insumos** que compra ou gera fora do PedeJá (e-mails, números de SMS, CPFs, emulador, endereços). No centro estão os três **pontos de exploração** (laranja) e os componentes internos que eles alimentam (azul): a base de contas e o **motor antifraude**. As setas grossas mostram o ciclo do bot (**1.** cria contas no PE1 → **2.** aplica o cupom no PE2 → **3.** lê a resposta no PE3 e volta ao passo 1). As setas tracejadas ligam cada ponto ao **ativo** (verde) que a ameaça atinge, com o ID da ameaça e do pressuposto. O **cliente novo legítimo** usa as mesmas interfaces que o bot; por isso toda defesa colocada nelas também o afeta.
+
 ### 4.3 Cenários de ameaça
 
 > Um **[ator]** pode realizar **[ação]** por meio de **[ponto de exploração]**, aproveitando
 > **[fraqueza ou pressuposto]**, causando **[impacto]** sobre **[ativo ou propriedade]**.
 
-- **AM1:**
-- **AM2:**
-- **AM3:**
+- **AM1 — Multicontas com e-mails descartáveis.** Um **bot caçador de cupons** pode **criar contas em massa com e-mails descartáveis e variações `nome+N@...` e resgatar o `BEMVINDO` uma vez em cada uma** por meio do **formulário de cadastro (PE1) e da regra de elegibilidade "uma vez por conta" (PE2)**, aproveitando **o pressuposto P1 (cada conta corresponde a uma pessoa real), que na verificação leve é conferido apenas pelo e-mail**, causando **o gasto de R$ 20 por conta falsa sem trazer nenhum cliente novo (≈ R$ 14 de prejuízo líquido por resgate; R$ 4.000 em uma semana na rodada 1)** sobre a **distribuição justa do orçamento de aquisição**.
+
+- **AM2 — Passar pela verificação rígida com sinais comprados.** Um **bot caçador de cupons** pode **completar a verificação rígida usando números virtuais de SMS, CPFs vazados de terceiros e um emulador que gera um novo identificador de dispositivo a cada conta** por meio do **formulário de cadastro com verificação de telefone e CPF (PE1)**, aproveitando **o pressuposto P2 (telefone, CPF e dispositivo são caros ou difíceis de obter em quantidade), que falha porque o custo por conta (c ≈ R$ 5) continua menor que os R$ 20 do desconto**, causando **resgates fraudulentos mesmo com a defesa mais forte ativa, cadastros feitos em nome de pessoas que nem usam o app e a perda do atrito que a B2 já cobrou dos clientes legítimos (conversão 70% → 55%) sem o benefício esperado** sobre o **orçamento de aquisição, a confiança nos dados de cadastro e a privacidade dos titulares dos CPFs**.
+
+- **AM3 — Sondagem das mensagens de recusa.** Um **bot caçador de cupons** pode **sondar o motor antifraude trocando um sinal de identidade por tentativa (dispositivo, depois endereço do vizinho ou da portaria) e ler a mensagem de recusa até descobrir qual sinal o denunciou** por meio das **mensagens de recusa e de pedido de verificação do checkout (PE3)**, aproveitando **a fraqueza das mensagens detalhadas ("este CPF já foi usado", "este dispositivo já resgatou o cupom") e o pressuposto P3 (mesmo dispositivo ou endereço indica a mesma pessoa), que o bot contorna variando exatamente o sinal indicado**, causando **a perda de eficácia de cada nova regra do motor (o bot aprende a contorná-la em poucas tentativas) e, como reação, regras mais duras por dispositivo e endereço que recusam famílias e repúblicas (falsos positivos)** sobre a **distribuição justa do orçamento de aquisição e a experiência de cadastro do cliente legítimo**.
+
+As três ameaças são **a mesma intenção em momentos diferentes da corrida** (seção 3): AM1 acontece enquanto o motor está em B1; AM2 é a resposta do bot à mudança para B2; AM3 é a resposta do bot à forma como o motor comunica as recusas. Nenhuma delas é um erro ou acidente: todas dependem de um agente que observa a resposta e muda a ação.
 
 ### 4.4 Avaliação de riscos
 
-Probabilidade e impacto: 1 = baixo, 2 = médio, 3 = alto. Risco = probabilidade × impacto.
+Probabilidade e impacto: 1 = baixo, 2 = médio, 3 = alto. Risco = probabilidade × impacto (de 1 a 9).
 
-| ID  | Cenário de ameaça | Ponto de exploração | Pressuposto ou fraqueza   | Ativo afetado | Probabilidade | Impacto | Risco |
-|-----|-------------------|---------------------|---------------------------|---------------|--------------:|--------:|------:|
-| AM1 |                   | PE1, PE2            | P1                        |               |               |         |       |
-| AM2 |                   | PE1                 | P2                        |               |               |         |       |
-| AM3 |                   | PE3                 | P3 / mensagens detalhadas |               |               |         |       |
+Para que as notas não fiquem arbitrárias, o grupo usou estes critérios, ligados aos custos do bot e aos ativos da seção 1:
 
-### 4.5 Ameaça prioritária: _[ID]_
+| Nota | Probabilidade (o bot consegue e compensa fazer?) | Impacto (se acontecer, quão ruim é?) |
+|-:|-|-|
+| 1 | Exige recursos raros ou caros; o custo por conta (c) chega perto ou passa de R$ 20 | Perda pontual do orçamento (menos de 1% ao mês), facilmente detectada; nenhum efeito sobre clientes legítimos |
+| 2 | Exige comprar insumos ou montar ferramentas (números, CPFs, emulador), mas c continua bem abaixo de R$ 20 | Perda relevante do orçamento **ou** dano a um ativo secundário (dados de cadastro, conversão), sem anular a defesa |
+| 3 | Custo ≈ zero, ferramentas públicas, automatizável por qualquer script; já aparece nas rodadas da seção 3 | Atinge o ativo principal **e** pelo menos um secundário, **ou** anula a defesa atual do motor (o bot passa a contorná-la sem custo extra) |
+
+As notas consideram o PedeJá **como descrito na seção 3**: começa na verificação leve, passa para a rígida e mantém mensagens de recusa detalhadas.
+
+| ID | Cenário de ameaça | Ponto de exploração | Pressuposto ou fraqueza | Ativo afetado | Probabilidade | Impacto | Risco |
+|-|-|-|-|-|-:|-:|-:|
+| AM1 | Bot cria contas em massa com e-mails descartáveis e resgata o `BEMVINDO` em cada uma | PE1, PE2 | P1 — e-mail novo = pessoa nova | Distribuição justa do orçamento de aquisição | 3 | 2 | **6** |
+| AM2 | Bot passa pela verificação rígida com números virtuais, CPFs vazados e emulador | PE1 | P2 — telefone, CPF e dispositivo seriam caros | Orçamento de aquisição; confiança nos dados de cadastro; privacidade dos titulares dos CPFs | 2 | 3 | **6** |
+| AM3 | Bot sonda o motor trocando um sinal por vez e lendo a mensagem de recusa | PE3 | Fraqueza: mensagens de recusa detalhadas; P3 — mesmo dispositivo/endereço = mesma pessoa | Orçamento de aquisição (via perda de eficácia das regras); experiência de cadastro do cliente legítimo | 3 | 3 | **9** |
+
+**Justificativa das notas:**
+
+- **AM1 — probabilidade 3:** e-mails descartáveis e variações `nome+N@` são gratuitos e ilimitados, e um script cria contas em lote (c ≈ R$ 0, rodada 1). **Impacto 2:** o prejuízo é real (R$ 4.000 em uma semana, 4% do orçamento mensal), mas atinge só o orçamento e deixa um rastro fácil de ver (pico de cadastros, poucos domínios, contas sem segunda compra). Foi o que fez o motor reagir já na primeira rodada.
+- **AM2 — probabilidade 2:** o bot precisa comprar números de SMS e CPFs e manter um emulador. Continua lucrativo (c ≈ R$ 5 contra R$ 20 de desconto), mas exige mais esforço e dinheiro que o AM1. **Impacto 3:** derrota a defesa mais forte que o motor tem (B2), cuja conta o cliente legítimo já pagou com a queda de conversão. Além disso, atinge três ativos e envolve dados de terceiros que nem participam da interação.
+- **AM3 — probabilidade 3:** não exige nenhum insumo novo. A mensagem é exibida em toda recusa, e uma única tentativa já revela qual sinal foi detectado (rodada 3). **Impacto 3:** é a ameaça que **anula todas as outras defesas**. Qualquer regra nova do motor (B2, ligação por dispositivo e endereço) é descoberta e contornada em poucas tentativas. E a reação natural do motor (regras mais duras) gera falsos positivos contra famílias e repúblicas.
+
+O **empate entre AM1 e AM2 (risco 6)** é desfeito pela ordem das rodadas: o AM1 é tratado primeiro porque é o mais barato para o bot e o mais fácil de detectar (basta sair de B1). O AM2 exige medidas mais caras e só aparece depois disso.
+
+### 4.5 Ameaça prioritária: AM3 — sondagem das mensagens de recusa (risco 9)
+
+O AM3 é a prioridade porque tem o maior risco e porque é ele que dá ao bot a capacidade de **se adaptar rápido**: enquanto as mensagens contarem qual sinal foi detectado, qualquer defesa contra AM1 e AM2 dura poucas tentativas. A resposta abaixo é a mesma adaptação do motor no fim da rodada 3 (seção 3), detalhada aqui. Os controles de cada ameaça estão na seção 5.
 
 1. **Como o sistema poderia responder:**
+   - trocar todas as mensagens de recusa por **uma única mensagem genérica** ("Não foi possível aplicar o cupom neste pedido"), sem dizer qual sinal causou a recusa. O motivo real fica **só no registro interno** do motor;
+   - **limitar as tentativas de resgate** por dispositivo, sessão e cartão (por exemplo, 3 tentativas em 24 h). Depois disso, o cupom deixa de ser oferecido naquela sessão;
+   - **detectar o padrão de sondagem**: uma sequência de contas ou tentativas em que só um campo muda (dispositivo, endereço) passa a ser recusada em conjunto, e não uma por uma;
+   - criar um **canal de contestação** para quem for recusado (por exemplo, enviar um comprovante de endereço ou falar com o suporte), para que o cliente legítimo não fique sem saída.
 2. **Que informação essa resposta revelaria:**
+   - o bot continua vendo o **resultado binário** (aceito ou recusado). Ainda dá para aprender por tentativa e erro, só que mais devagar e mais caro;
+   - a **troca repentina** da mensagem detalhada pela genérica mostra ao bot que **a sondagem foi percebida**;
+   - o limite de tentativas pode ser descoberto: se a 4ª tentativa do mesmo aparelho sempre falha, o bot conclui que o limite é 3;
+   - o canal de contestação mostra **que tipo de prova o PedeJá aceita** para reverter uma recusa.
 3. **Como o adversário se adaptaria na rodada seguinte:**
+   - **espalhar as tentativas** por muitos dispositivos emulados e sessões, ficando abaixo do limite em cada um;
+   - trocar **vários sinais ao mesmo tempo** e inferir a regra pela **taxa de aceitação de lotes** de contas (testa 50 contas com endereço variado e 50 sem, e compara), em vez de ler a mensagem;
+   - tentar **abusar do canal de contestação** com comprovantes falsos ou de terceiros;
+   - com isso o custo por resgate sobe (c ≈ R$ 8 ou mais), mas continua abaixo de R$ 20. Por isso o bot não desiste, o que leva de volta à corrida armamentista da seção 3.2.
 4. **Efeitos colaterais sobre usuários legítimos:**
+   - o cliente recusado **não sabe o motivo** (por exemplo, alguém da família já usou o cupom no mesmo endereço) e não consegue corrigir sozinho. Isso gera mais chamados no suporte e mais desistências;
+   - o limite de tentativas pune quem **erra a digitação** do CPF ou do telefone algumas vezes;
+   - a contestação é **mais um passo**: o cliente espera a análise ou faz o primeiro pedido sem desconto, justamente na compra que o cupom deveria facilitar.
 5. **Risco que continua existindo após a resposta:**
+   - a sondagem não acaba, só fica mais lenta e cara. A probabilidade do AM3 cai de 3 para 2 (o bot precisa de muitos dispositivos e sessões para aprender) e o impacto cai de 3 para 2 (o bot não descobre mais qual regra pegou cada conta). **Risco residual estimado: 2 × 2 = 4**;
+   - o **AM2 não é afetado** pela mensagem genérica: enquanto números de SMS, CPFs e emulador custarem menos que R$ 20 por conta, ainda há resgates fraudulentos;
+   - os **falsos positivos do P3** (aparelho e endereço compartilhados) continuam. A contestação só reduz o dano depois que ele aconteceu.
 6. **O que o sistema precisa continuar preservando:**
+   - **um cupom por pessoa real**: a distribuição justa do orçamento de aquisição continua sendo o objetivo, e nenhuma resposta pode ser "liberar tudo" só para reduzir reclamações;
+   - **um caminho para o cliente legítimo**: atrito baixo no cadastro e sempre uma forma de contestar a recusa, sem ficar bloqueado sem explicação;
+   - **o mínimo de dados pessoais** (LGPD): endurecer a defesa não justifica coletar mais dados do que o necessário para verificar a identidade;
+   - **a capacidade do motor de observar**: o motivo real de cada recusa e as tentativas de sondagem precisam continuar registrados internamente, porque são esses dados que permitem ao motor se adaptar na rodada seguinte (seções 5 e 6).
 
 ---
 
