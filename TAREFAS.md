@@ -64,8 +64,8 @@
 
 ### Eduardo Dutra Ferreira (@ed-dferreira) — Seções 5 e 6
 
-- [ ] **Seção 5 — Redesenho e resiliência (15 pts)** para AM1–AM3 (a partir da Ficha e da rodada 3 da Vitoria: mensagem genérica, limite de tentativas, canal de contestação): para cada ameaça, controle contextualizado, mudança de incentivo do bot, sinal/métrica observado pelo motor, próxima adaptação esperada do bot e risco residual. Explicar por que nenhuma defesa é definitiva.
-- [ ] **Seção 6 — Arquitetura para o Trabalho 2 (curta):** escopo, tecnologia escolhida (sugestão: Python + SQLite), componentes e eventos registrados (logs que alimentam as métricas da seção 5).
+- [x] **Seção 5 — Redesenho e resiliência (15 pts)** para AM1–AM3 (a partir da Ficha e da rodada 3 da Vitoria: mensagem genérica, limite de tentativas, canal de contestação): para cada ameaça, controle contextualizado, mudança de incentivo do bot, sinal/métrica observado pelo motor, próxima adaptação esperada do bot e risco residual. Explicar por que nenhuma defesa é definitiva.
+- [x] **Seção 6 — Arquitetura para o Trabalho 2 (curta):** escopo, tecnologia escolhida (sugestão: Python + SQLite), componentes e eventos registrados (logs que alimentam as métricas da seção 5).
 - [ ] Slides + gravação da fala de redesenho e arquitetura.
 
 ---
@@ -100,7 +100,7 @@ Para exportar diagramas: `npx -p @mermaid-js/mermaid-cli mmdc -i diagramas/x.mmd
 
 - [x] interação específica e bem delimitada
 - [x] atores, objetivos, ativos, capacidades, informações e pressupostos
-- [ ] matriz de payoffs explicada
+- [x] matriz de payoffs explicada
 - [x] ≥ 3 rodadas de ação, resposta, observação e adaptação
 - [x] 3 diagramas (PNG + fonte editável)
 - [x] ≥ 3 ameaças ligadas ao sistema
