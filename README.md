@@ -777,8 +777,8 @@ elegível quanto ao valor, respeitando a regra “acima de R\$ 30”.
 > **Depois que o sistema responder, o que o outro lado aprenderá e tentará fazer em seguida?**
 
 A resposta do sistema é o último movimento do **motor antifraude** na seção 3 (rodada 3, ameaça **AM3**):
-**mensagem de recusa genérica**, **limite de tentativas por dispositivo e sessão** e **canal de contestação** para
-falsos positivos (controles detalhados em 5.1). A pergunta é o que o **bot caçador de cupons** aprende com essa resposta,
+**mensagem de recusa genérica**, **limite de tentativas por dispositivo e sessão**, **detecção de sondagem** e **canal de
+contestação** para falsos positivos (os quatro controles da seção 4.5, detalhados em 5.1 e 5.2). A pergunta é o que o **bot caçador de cupons** aprende com essa resposta,
 o que ele tenta em seguida e o que o motor aprende com a reação.
 
 ### 7.1 O que o bot aprende
@@ -813,7 +813,7 @@ Se nada disso compensar, o bot pode migrar para outro alvo (outro cupom ou aplic
   atrasadas.
 
 O próximo movimento do motor é ajustar limiares e intervalos, revisar contas já aprovadas e medir o custo da defesa
-(verificações, atendimento, perda de conversão), como descrito em 5.4.
+(verificações, atendimento, perda de conversão), como descrito em 5.5.
 
 ### 7.4 Síntese
 
