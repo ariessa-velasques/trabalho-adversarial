@@ -1,27 +1,6 @@
 # Referências
 
-> Responsável: **Guilherme**. Todos adicionam aqui as fontes que usarem, indicando a seção.
-
-Formato sugerido (ABNT simplificada):
-
-`SOBRENOME, Nome. Título. Veículo/Editora, ano. Disponível em: <URL>. Acesso em: dd/mm/aaaa.` — _usada na seção X_
-
-## Material da disciplina
-
--
-
-## Teoria dos jogos
-
--
-
-## Modelagem de ameaças e riscos
-
--
-
-## Sobre o sistema analisado (documentação pública, notícias, casos reais)
-
--
-
+Referências citadas no relatório (`README.md`). Os números entre colchetes no texto remetem a esta lista.
 
 ## Teoria dos jogos
 
@@ -54,8 +33,8 @@ Formato sugerido (ABNT simplificada):
 
 ## Material da disciplina
 
-14. [Preencher: slides e aulas do professor sobre sistemas adversariais, modelo estático, modelo dinâmico e ameaças e
-    riscos, com título, data da aula e link do material.]
+14. Enunciado do Trabalho 1 — *Análise de um Sistema Adversarial: modelo estático, modelo dinâmico, ameaças e riscos*.
+    Material da disciplina, 2026. (Definição de sistema adversarial, estrutura do trabalho e critérios de avaliação.)
 
 ## Legislação
 
@@ -65,7 +44,4 @@ Formato sugerido (ABNT simplificada):
 ## Fontes públicas sobre o sistema escolhido
 
 O **PedeJá** é um sistema hipotético, e os valores do trabalho (R$ 20, R$ 30, R$ 100.000, comissão de 20%) são
-sintéticos. Se o grupo usar fontes públicas sobre abuso de cupons de primeira compra em aplicativos de delivery
-(termos de uso, relatos de plataformas, artigos), listá-las aqui com autor, título, data de acesso e link:
-
-16. [Preencher, se houver.]
+sintéticos. Não foram usados dados nem documentos de plataformas reais.
