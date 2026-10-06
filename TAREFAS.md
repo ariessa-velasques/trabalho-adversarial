@@ -56,10 +56,10 @@
 ### Guilherme Jaques (@Novato320) — Seções 7, 8, 9, 10 e template da apresentação
 
 - [ ] **Seção 7 — Conclusão: pergunta final** ("depois que o sistema responder, o que o outro lado aprenderá e tentará fazer em seguida?"), respondida para o PedeJá com base nas ameaças AM1–AM3 da Ficha.
-- [ ] **Seção 8 — Fundamentação conceitual:** definições curtas e referenciadas (jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso, risco e risco residual).
+- [x] **Seção 8 — Fundamentação conceitual:** definições curtas e referenciadas (jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso, risco e risco residual).
 - [ ] **Seção 9 — `fontes/referencias.md`:** organizar as referências (material da disciplina, teoria dos jogos, modelagem de ameaças, fontes públicas sobre o sistema escolhido).
-- [ ] **Seção 10 — Declaração de uso de IA:** escrever o texto introdutório (cada integrante preenche a própria linha da tabela).
-- [ ] Criar o **template no Canva** e compartilhar com o grupo **até quinta, 01/10** (antes de qualquer conteúdo); preencher `apresentacao/roteiro.md`.
+- [x] **Seção 10 — Declaração de uso de IA:** escrever o texto introdutório (cada integrante preenche a própria linha da tabela).
+- [x] Criar o **template no Canva** e compartilhar com o grupo **até quinta, 01/10** (antes de qualquer conteúdo); preencher `apresentacao/roteiro.md`.
 - [ ] Slides + gravação da fala de abertura e conclusão.
 
 ### Eduardo Dutra Ferreira (@ed-dferreira) — Seções 5 e 6
