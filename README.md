@@ -834,7 +834,45 @@ inviável para o **cliente novo legítimo**.
 
 > Responsável: **Guilherme**
 
-_[Definições curtas, com referência, dos conceitos usados no trabalho: sistema adversarial, jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso × impacto × risco, risco residual.]_
+As definições abaixo são curtas e cada uma é ligada ao caso do **PedeJá**. Os números entre colchetes remetem a
+[`fontes/referencias.md`](fontes/referencias.md).
+
+### 8.1 Teoria dos jogos
+ 
+| Conceito                     | Definição                                                                                                                                                                                      | No PedeJá                                                                                                                                  |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| **Sistema adversarial**      | Sistema em que participantes com objetivos total ou parcialmente conflitantes tomam decisões e adaptam o comportamento ao que observam do outro [4][14].                                       | Bot e motor antifraude disputam o orçamento do `BEMVINDO`: o que um ganha, o outro perde.                                                  |
+| **Jogo**                     | Situação em que cada jogador escolhe uma ação e o resultado de cada um depende das escolhas de todos [1][2].                                                                                   | Jogo 2×2: A1/A2 (bot) × B1/B2 (motor).                                                                                                     |
+| **Payoff**                   | Valor que representa o quanto um jogador prefere um resultado. Em jogos simples, basta a **ordem de preferência** (por exemplo, 0 a 3) [1].                                                    | Cada célula da matriz traz `(payoff do bot, payoff do motor)`, justificado pelos custos da seção 1.                                         |
+| **Melhor resposta**          | Ação que dá o maior payoff a um jogador, dada a ação escolhida pelo outro [1].                                                                                                                 | Dado B1, qual é a melhor ação do bot? E dado B2? (seção 2.3)                                                                               |
+| **Estratégia dominante**     | Ação que é melhor resposta **qualquer que seja** a ação do outro jogador [1][2]. Não é obrigatório que exista.                                                                                 | Verificada na seção 2.4.                                                                                                                   |
+| **Equilíbrio de Nash**       | Combinação de ações em que nenhum jogador melhora mudando **sozinho** [3][1]. Não significa que o resultado seja bom para o sistema nem para os usuários.                                       | Resultado estável da matriz; avaliamos se é bom para o cliente legítimo (seção 2.6).                                                       |
+| **Jogo repetido**            | Mesmo jogo jogado em várias rodadas, em que as escolhas passadas são observadas e podem condicionar as seguintes [1][2][5].                                                                    | As 3 rodadas da seção 3: o motor só passa a B2 depois de observar o pico de cadastros da rodada 1.                                         |
+| **Corrida armamentista**     | Escalada em que cada lado responde ao último movimento do outro com um movimento mais caro, em um ciclo de adaptação mútua. O termo vem da biologia evolutiva [6] e é usado em segurança [9][10]. | Verificação rígida → números virtuais → sondagem → mensagem genérica → testes distribuídos. Termina para o bot quando c ≥ R$ 20.            |
+ 
+### 8.2 Segurança e análise de ameaças
+ 
+| Conceito                 | Definição                                                                                                                                                  | No PedeJá                                                                                                  |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| **Ativo**                | Aquilo que tem valor e precisa ser protegido: um recurso ou uma propriedade como confiança, privacidade, disponibilidade ou justiça [8][9].                | Distribuição justa do orçamento de aquisição (um desconto por pessoa real).                                |
+| **Superfície de ataque** | Conjunto de pontos (interfaces, regras, fluxos, recursos) pelos quais um adversário pode tentar interagir com o sistema ou extrair algo dele [7].          | PE1 (cadastro), PE2 (regra de elegibilidade), PE3 (mensagens de recusa).                                   |
+| **Vulnerabilidade**      | Fraqueza do sistema, de um controle ou de um pressuposto que pode ser explorada [11].                                                                      | A regra "um cupom por conta" pressupõe 1 conta = 1 pessoa (P1).                                            |
+| **Ameaça**               | Circunstância ou evento com potencial de causar impacto negativo sobre um ativo, por exemplo, um ator que explora uma vulnerabilidade [11][8].             | AM1, AM2 e AM3: cenários no formato "ator, ação, ponto de exploração, fraqueza, impacto, ativo".           |
+| **Ataque**               | Ação concreta de um adversário que tenta explorar a vulnerabilidade [9].                                                                                   | Criar ≈ 200 contas com e-mails descartáveis e resgatar o cupom em cada uma (rodada 1).                     |
+| **Caso de abuso**        | Descrição de uma interação em que o sistema é usado de forma legítima na aparência, mas com intenção de causar dano [13][12].                              | Cada cadastro e cada resgate são funcionalidades normais; o abuso está em usá-las em massa.                |
+| **Impacto**              | Consequência da ameaça concretizada sobre o ativo [11].                                                                                                    | R$ 4.000 do orçamento (4%) em ≈ 200 resgates fraudulentos na rodada 1.                                     |
+| **Risco**                | Função da probabilidade de a ameaça ocorrer e do seu impacto [11]. Neste trabalho: risco = probabilidade × impacto, com escala de 1 a 3.                    | Tabela de risco da seção 4.4.                                                                              |
+| **Risco residual**       | Risco que permanece depois de aplicado um controle [11].                                                                                                   | Ex.: com mensagem genérica, o resultado aceito/recusado ainda informa o bot (seção 5.1).                   |
+
+ ### 8.3 Como os conceitos se encadeiam
+ 
+Um **ator** (o fraudador, por meio do bot) usa um **ataque** em um ponto da **superfície de ataque**, explorando uma
+**vulnerabilidade** (por exemplo, P1 falha), e causa um **impacto** sobre um **ativo**. A combinação de probabilidade e
+impacto define o **risco**. O **controle** do motor reduz o risco, mas deixa um **risco residual** e produz informação
+que o adversário usa na rodada seguinte, o que dá origem ao jogo repetido e à possível **corrida armamentista**.
+ 
+Dois cuidados do trabalho, alinhados ao enunciado: não tratar todo erro como ação adversarial (uma família que
+compartilha endereço é falso positivo, não ataque) e não confundir ator, ativo, ameaça, vulnerabilidade e impacto.
 
 ---
 
