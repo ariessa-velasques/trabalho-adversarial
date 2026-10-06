@@ -887,7 +887,22 @@ Ver [`fontes/referencias.md`](fontes/referencias.md).
 > Responsável pelo texto: **Guilherme**. **Cada integrante preenche a própria linha** no seu próprio commit (se não usou
 > IA, escreva "não utilizou").
 
-_[Texto introdutório — Guilherme.]_
+O grupo declara o uso de ferramentas de IA generativa na elaboração deste trabalho, conforme exigido no enunciado. O uso
+não é proibido, mas deve ser informado: a tabela abaixo indica, **para cada integrante**, qual ferramenta foi usada, em
+qual tarefa e como o conteúdo foi verificado.
+ 
+Critérios adotados pelo grupo:
+ 
+- **A IA não substitui a decisão do grupo.** O sistema, a interação, os atores, as ações do jogo, os IDs P1–P3, PE1–PE3
+  e AM1–AM3 e os valores hipotéticos foram definidos em reunião (Ficha do sistema, seção 0).
+- **Todo conteúdo produzido com IA foi lido e conferido pelo integrante responsável**, comparando-o com a Ficha, com as
+  demais seções do README (nomes, IDs e valores) e com as referências citadas.
+- **Referências sugeridas por IA foram checadas na fonte original** antes de entrar em `fontes/referencias.md`; fonte que
+  não pôde ser confirmada foi removida.
+- **Todos os integrantes devem conseguir explicar qualquer parte do relatório**, inclusive as escritas com apoio de IA,
+  e respondem por ela.
+- Nenhum dado real de usuários ou de plataformas foi enviado a ferramentas de IA; o PedeJá é hipotético e os valores são
+  sintéticos.
 
 | Integrante                               | Ferramenta           | Tarefa em que foi utilizada                                                                            | Como o conteúdo foi verificado                                                              |
 |------------------------------------------|----------------------|--------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
@@ -895,7 +910,7 @@ _[Texto introdutório — Guilherme.]_
 | Maria Eduarda Sanchez Chessio | Claude (Anthropic) | Rascunho da seção 4 (pontos de exploração, cenários de ameaça, critérios e tabela de risco, ameaça prioritária) e do diagrama de superfície de ataque; apoio na revisão de consistência | Conferi cada ameaça, ponto de exploração e pressuposto contra a Ficha (seção 0) e as seções 1 e 3; revisei as notas de probabilidade e impacto com base nos custos e valores da seção 3; validei o diagrama no Mermaid; li e ajustei o texto antes de cada commit |
 | Mirieli Rodrigues dos Santos de Oliveira |                      |                                                                                                        |                                                                                             |
 | Vitoria Pereira Garcia | Claude (Anthropic) | Revisão e correção de texto da seção 3; conferência de consistência com as seções 2, 4, 5 e 6 (valores, IDs e controles da AM3), que levou ao ajuste da rodada 3 e à correção de uma tabela em Markdown; atualização e exportação do diagrama do ciclo adaptativo; apoio na organização dos slides e do roteiro da minha fala | Escrevi a seção 3 e o diagrama antes de usar a IA; conferi números e IDs contra a Ficha e as seções 1, 2, 4 e 5; comparei o diagrama com a tabela das rodadas; li e ajustei o texto antes do commit e revisei slides e roteiro |
-| Guilherme Jaques                         |                      |                                                                                                        |                                                                                             |
+| Guilherme Jaques | Claude (Anthropic) | Rascunho das seções 7, 8, 10 e referencias | Conteudo conferido contra a Ficha (seção 0) e as seções 1, 3 e 5, checando nomes, IDs e valores hipotéticos; referências verificadas na fonte original, removendo as que não puderam ser confirmadas; |
 | Eduardo Dutra Ferreira                   | ChatGPT e NotebookLM | Apoio à pesquisa, esclarecimento de dúvidas, revisão textual e estruturação do arquivo Markdown (.md). | Revisão manual do conteúdo e conferência de sua coerência com as demais seções do trabalho. |
 
 ---
