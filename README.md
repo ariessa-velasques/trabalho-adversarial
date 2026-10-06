@@ -776,7 +776,57 @@ elegível quanto ao valor, respeitando a regra “acima de R\$ 30”.
 
 > **Depois que o sistema responder, o que o outro lado aprenderá e tentará fazer em seguida?**
 
-_[Responder para o PedeJá: depois da última resposta do motor antifraude (seção 3 / ameaça prioritária da seção 4), o que o bot aprende e qual é a próxima ação provável? E o que o motor antifraude aprende com isso?]_
+A resposta do sistema é o último movimento do **motor antifraude** na seção 3 (rodada 3, ameaça **AM3**):
+**mensagem de recusa genérica**, **limite de tentativas por dispositivo e sessão** e **canal de contestação** para
+falsos positivos (controles detalhados em 5.1). A pergunta é o que o **bot caçador de cupons** aprende com essa resposta,
+o que ele tenta em seguida e o que o motor aprende com a reação.
+
+### 7.1 O que o bot aprende
+
+- **Perdeu o oráculo.** Na rodada 3, a mensagem detalhada dizia qual sinal repetiu (dispositivo ou endereço). Com a
+  mensagem genérica ("não foi possível aplicar o cupom"), cada tentativa devolve basicamente **aceito ou recusado**. O
+  bot precisa de mais tentativas para obter a mesma informação.
+- **Aprende que sondar rápido, um sinal por vez, é o que o denuncia.** O limite por dispositivo e sessão e os intervalos
+  entre tentativas suspeitas mostram que o motor observa **sequências** e não apenas contas isoladas.
+- **Percebe que o custo subiu.** Na rodada 3, c ≈ R$ 8 e o ganho era ≈ R$ 12 por resgate (R$ 20 − c). Com testes mais
+  lentos e menos informativos, c tende a subir, mas a fraude só deixa de compensar quando **c ≥ R$ 20**.
+
+### 7.2 O que o bot tentará em seguida
+
+O objetivo do bot não muda (maximizar resgates com o menor custo por conta); muda a ação. A próxima tentativa provável
+é a que a seção 5.1 prevê para AM3:
+
+1. **Distribuir as tentativas** entre sessões, dispositivos e horários, para ficar abaixo dos limites e dos intervalos.
+2. **Inferir as regras pelo resultado aceito/recusado**, comparando muitas contas em vez de ler uma mensagem.
+3. **Trocar vários sinais de uma vez** (dispositivo, endereço, telefone, CPF), reduzindo as ligações entre contas.
+4. Como **hipótese**, usar o canal de contestação como nova fonte de informação, observando quais recusas são revistas.
+
+Se nada disso compensar, o bot pode migrar para outro alvo (outro cupom ou aplicativo).
+
+### 7.3 O que o motor antifraude aprende
+
+- **Contestações aprovadas revelam falsos positivos**, principalmente em endereços e dispositivos compartilhados por
+  famílias e repúblicas (**P3**). Isso mostra onde as regras por dispositivo e endereço atingem o cliente legítimo.
+- **Menos sondagens rápidas não significam menos abuso.** Pode ser o bot se adaptando. O motor precisa passar a observar
+  sinais mais sutis: resgates sem segunda compra, relações entre contas e sequências espalhadas no tempo.
+- **A visibilidade diminui.** Quanto mais o bot distribui as tentativas, mais o motor depende de métricas agregadas e
+  atrasadas.
+
+O próximo movimento do motor é ajustar limiares e intervalos, revisar contas já aprovadas e medir o custo da defesa
+(verificações, atendimento, perda de conversão), como descrito em 5.4.
+
+### 7.4 Síntese
+
+| Lado                | O que aprende com a última resposta                                  | O que tenta em seguida                                                       |
+|---------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------|
+| **Bot**             | O checkout não explica mais a recusa; sondagem rápida é detectada    | Testes distribuídos, inferência por aceito/recusado, vários sinais trocados  |
+| **Motor antifraude** | Há falsos positivos em endereços compartilhados; o bot se adaptou    | Ajustar limiares, revisar contas aprovadas, observar sequências e relações   |
+
+O ciclo **ação → resposta → observação → adaptação** não termina: toda defesa produz informação, e o outro lado a usa na
+rodada seguinte. Por isso nenhuma resposta do motor é definitiva. O que o **PedeJá** precisa continuar preservando, apesar
+das adaptações, é a **distribuição justa do orçamento de aquisição (um desconto por pessoa real)** sem tornar o cadastro
+inviável para o **cliente novo legítimo**.
+
 
 ---
 
