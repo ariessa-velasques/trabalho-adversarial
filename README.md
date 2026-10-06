@@ -38,8 +38,8 @@ desconto de primeira compra (`BEMVINDO`)
 
 ## 0. Ficha do sistema (decisão do grupo)
 
-> Preenchida em conjunto na reunião inicial. **Todas as seções usam estes nomes** — não renomeiem atores, ativos ou
-> ações sem atualizar esta ficha.
+> Definida em conjunto e validada pelo grupo na reunião inicial. Todas as seções usam os nomes, valores e IDs desta
+> ficha.
 
 | Item                                       | Decisão                                                                                                                                                                                                                                                                                                                                  |
 |--------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -54,7 +54,7 @@ desconto de primeira compra (`BEMVINDO`)
 | Decisão central do jogo (A1/A2 × B1/B2)    | **A1** = **conta única**: o bot opera uma só conta, com comportamento igual ao de um cliente legítimo (não ataca); **A2** = criar contas falsas para resgatar o cupom várias vezes (**multicontas**). **B1** = **verificação leve** (só e-mail); **B2** = **verificação rígida** (SMS no telefone + CPF + identificação do dispositivo). |
 | Fora do escopo                             | Pagamento e fraude de cartão, entrega e entregadores, avaliações de restaurantes, programa de fidelidade, outros cupons, ataques à infraestrutura (DoS, invasão).                                                                                                                                                                        |
 
-**Vocabulário comum (usar exatamente estes termos em todas as seções):**
+**Vocabulário comum:**
 
 | Termo                     | Significado                                                                      |
 |---------------------------|----------------------------------------------------------------------------------|
@@ -66,8 +66,8 @@ desconto de primeira compra (`BEMVINDO`)
 | resgate                   | aplicação do cupom a um pedido concluído                                         |
 | bot / motor antifraude    | os dois agentes de software que jogam o jogo (A e B)                             |
 
-**Âncoras de rastreabilidade (IDs fixos — todas as seções referenciam estes IDs; cada seção detalha, mas não renomeia
-nem remove):**
+**Rastreabilidade:** os pressupostos, pontos de exploração e ameaças abaixo recebem IDs fixos, usados em todas as
+seções. Cada seção detalha esses itens a partir daqui.
 
 > As ameaças usam o prefixo **AM** para não confundir com as ações **A1/A2** do jogo.
 
@@ -884,8 +884,7 @@ Ver [`fontes/referencias.md`](fontes/referencias.md).
 
 ## 10. Declaração de uso de IA generativa
 
-> Responsável pelo texto: **Guilherme**. **Cada integrante preenche a própria linha** no seu próprio commit (se não usou
-> IA, escreva "não utilizou").
+> Responsável pelo texto: **Guilherme**. Cada integrante preencheu a própria linha da tabela.
 
 O grupo declara o uso de ferramentas de IA generativa na elaboração deste trabalho, conforme exigido no enunciado. O uso
 não é proibido, mas deve ser informado: a tabela abaixo indica, **para cada integrante**, qual ferramenta foi usada, em
