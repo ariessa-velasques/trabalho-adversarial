@@ -28,14 +28,14 @@
 - [x] Criar o repositório no GitHub, subir esta estrutura e adicionar todos como colaboradores.
 - [x] Registrar a Ficha do sistema no README durante a reunião.
 - [x] **Seção 1 — Descrição do sistema adversarial:** sistema e interação, atores e objetivos, ativo preservado, tabela de atores, detalhar os pressupostos P1–P3 e como falham, por que é adversarial.
-- [x] **Diagrama de contexto** (`diagramas/contexto.mmd` → `contexto.png`).
+- [x] **Diagrama de contexto** (`diagramas` → `contexto.png`).
 - [ ] Integração final do README (com Maria Eduarda).
 - [ ] **Montagem do vídeo** com as gravações de todos e publicação no YouTube.
 
 ### Maria Eduarda Sanchez Chessio — Seção 4 e revisão de consistência
 
 - [x] **Seção 4 — Ameaças e riscos:** detalhar PE1–PE3, escrever AM1–AM3 no formato exigido, tabela de risco (probabilidade × impacto), escolher a prioritária e responder os 6 itens.
-- [x] **Diagrama de superfície de ataque** (`diagramas/superficie-de-ataque.mmd` → `.png`).
+- [x] **Diagrama de superfície de ataque** (`diagramas` → `.png`).
 - [ ] Revisão de consistência (domingo, 04/10): conferir se atores, ações, pressupostos e ativos batem entre as seções 1 a 6 (rastreabilidade = 25 pts).
 
 ### Mirieli Rodrigues dos Santos de Oliveira (@mirielii) — Seção 2
@@ -49,7 +49,7 @@
 ### Vitoria Pereira Garcia (@vitoriapgarcia7) — Seção 3
 
 - [x] **Seção 3 — Modelo estratégico dinâmico:** tabela com ≥ 3 rodadas (ação → resposta → observação → adaptação), mostrando que o defensor também se adapta e que a defesa gera custo ao usuário legítimo (dica: as rodadas podem seguir P1 → P2 → P3 / AM1 → AM2 → AM3 da Ficha).
-- [x] **Diagrama do ciclo adaptativo** (`diagramas/ciclo-adaptativo.mmd` → `.png`).
+- [x] **Diagrama do ciclo adaptativo** (`diagramas` → `.png`).
 - [x] Responder as 5 perguntas de síntese (quem observa quem, o que muda, gatilho, custo, corrida armamentista).
 - [ ] Slides + gravação da fala do modelo dinâmico.
 
@@ -57,9 +57,9 @@
 
 - [ ] **Seção 7 — Conclusão: pergunta final** ("depois que o sistema responder, o que o outro lado aprenderá e tentará fazer em seguida?"), respondida para o PedeJá com base nas ameaças AM1–AM3 da Ficha.
 - [x] **Seção 8 — Fundamentação conceitual:** definições curtas e referenciadas (jogo, payoff, melhor resposta, estratégia dominante, equilíbrio de Nash, jogo repetido, corrida armamentista, superfície de ataque, ativo, ameaça × vulnerabilidade × ataque × caso de abuso, risco e risco residual).
-- [ ] **Seção 9 — `fontes/referencias.md`:** organizar as referências (material da disciplina, teoria dos jogos, modelagem de ameaças, fontes públicas sobre o sistema escolhido).
+- [ ] **Seção 9 — `fontes`:** organizar as referências (material da disciplina, teoria dos jogos, modelagem de ameaças, fontes públicas sobre o sistema escolhido).
 - [x] **Seção 10 — Declaração de uso de IA:** escrever o texto introdutório (cada integrante preenche a própria linha da tabela).
-- [x] Criar o **template no Canva** e compartilhar com o grupo **até quinta, 01/10** (antes de qualquer conteúdo); preencher `apresentacao/roteiro.md`.
+- [x] Criar o **template no Canva** e compartilhar com o grupo **até quinta, 01/10** (antes de qualquer conteúdo); preencher `apresentacao`.
 - [ ] Slides + gravação da fala de abertura e conclusão.
 
 ### Eduardo Dutra Ferreira (@ed-dferreira) — Seções 5 e 6

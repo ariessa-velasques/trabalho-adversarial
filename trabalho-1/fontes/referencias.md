@@ -1,6 +1,6 @@
 # Referências
 
-Referências citadas no relatório (`README.md`). Os números entre colchetes no texto remetem a esta lista.
+Referências citadas no relatório (`../README.md`). Os números entre colchetes no texto remetem a esta lista.
 
 ## Teoria dos jogos
 
