@@ -173,7 +173,7 @@ intencional do bot** (e não apenas por acaso), e é daí que saem as ameaças d
 
 ![Diagrama de contexto](diagramas/contexto.png)
 
-Fonte editável: [`diagramas/contexto.mmd`](diagramas/contexto.mmd)
+Fonte editável: [`diagramas`](diagramas/contexto.mmd)
 
 ### 1.5 Por que é adversarial (e não apenas erro ou acidente)
 
@@ -327,7 +327,7 @@ diferença que o modelo dinâmico acrescenta.
 
 ![Ciclo adaptativo](diagramas/ciclo-adaptativo.png)
 
-Fonte editável: [`diagramas/ciclo-adaptativo.mmd`](diagramas/ciclo-adaptativo.mmd)
+Fonte editável: [`diagramas`](diagramas/ciclo-adaptativo.mmd)
 
 ### 3.2 Síntese
 
@@ -380,7 +380,7 @@ Os três pontos formam uma sequência: o bot **entra** pelo PE1, **lucra** pelo 
 
 ![Superfície de ataque](diagramas/superficie-de-ataque.png)
 
-Fonte editável: [`diagramas/superficie-de-ataque.mmd`](diagramas/superficie-de-ataque.mmd)
+Fonte editável: [`diagramas`](diagramas/superficie-de-ataque.mmd)
 
 **Como ler o diagrama:** à esquerda está o **bot caçador de cupons** com os **insumos** que compra ou gera fora do PedeJá (e-mails, números de SMS, CPFs, emulador, endereços). No centro estão os três **pontos de exploração** (laranja) e os componentes internos que eles alimentam (azul): a base de contas e o **motor antifraude**. As setas grossas mostram o ciclo do bot (**1.** cria contas no PE1 → **2.** aplica o cupom no PE2 → **3.** lê a resposta no PE3 e volta ao passo 1). As setas tracejadas ligam cada ponto ao **ativo** (verde) que a ameaça atinge, com o ID da ameaça e do pressuposto. O **cliente novo legítimo** usa as mesmas interfaces que o bot; por isso toda defesa colocada nelas também o afeta.
 
@@ -835,7 +835,7 @@ inviável para o **cliente novo legítimo**.
 > Responsável: **Guilherme**
 
 As definições abaixo são curtas e cada uma é ligada ao caso do **PedeJá**. Os números entre colchetes remetem a
-[`fontes/referencias.md`](fontes/referencias.md).
+[`fontes`](fontes/referencias.md).
 
 ### 8.1 Teoria dos jogos
  
@@ -878,7 +878,7 @@ compartilha endereço é falso positivo, não ataque) e não confundir ator, ati
 
 ## 9. Referências
 
-Ver [`fontes/referencias.md`](fontes/referencias.md).
+Ver [`fontes`](fontes/referencias.md).
 
 ---
 
@@ -896,7 +896,7 @@ Critérios adotados pelo grupo:
   e AM1–AM3 e os valores hipotéticos foram definidos em reunião (Ficha do sistema, seção 0).
 - **Todo conteúdo produzido com IA foi lido e conferido pelo integrante responsável**, comparando-o com a Ficha, com as
   demais seções do README (nomes, IDs e valores) e com as referências citadas.
-- **Referências sugeridas por IA foram checadas na fonte original** antes de entrar em `fontes/referencias.md`; fonte que
+- **Referências sugeridas por IA foram checadas na fonte original** antes de entrar em `fontes`; fonte que
   não pôde ser confirmada foi removida.
 - **Todos os integrantes devem conseguir explicar qualquer parte do relatório**, inclusive as escritas com apoio de IA,
   e respondem por ela.
