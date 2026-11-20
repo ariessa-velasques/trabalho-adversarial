@@ -2,7 +2,7 @@
 
 ## Status
 
-Aceita — 18/11/2026
+Substituída por [ADR-014](ADR-014-frontend-react-typescript.md) — 20/11/2026. O registro abaixo é histórico.
 
 ## Contexto
 

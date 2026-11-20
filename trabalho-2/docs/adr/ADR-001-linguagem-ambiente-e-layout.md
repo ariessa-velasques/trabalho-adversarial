@@ -2,7 +2,8 @@
 
 ## Status
 
-Aceita — 18/11/2026 — complementada pela ADR-010 (organização interna em MVC).
+Aceita — 18/11/2026 — complementada pela ADR-010 (organização interna em MVC). Emendada em 20/11/2026: a camada
+Streamlit foi substituída pelo frontend React/TypeScript (ADR-014); Python e uv permanecem.
 
 ## Contexto
 
@@ -21,8 +22,10 @@ Aceita — 18/11/2026 — complementada pela ADR-010 (organização interna em M
 1. Usar **Python 3.12**, versão estável com wheels disponíveis para toda a stack.
 2. Usar **`uv`** como único gerenciador (`uv sync`, `uv add`, `uv run`, `uv lock`). Nada de `pip`, virtualenv manual ou
    `requirements.txt`.
-3. Manter o **layout `src`**: módulos de topo em `src/` (`models/`, `agents/`, `controllers/`, `views/`, `evaluation/`), com
-   `app.py`, `config/`, `tests/` e `saidas/` na raiz de `trabalho-2/`. A organização segue a ADR-010 (MVC simples).
+3. Manter o **layout `src`**: módulos de topo em `src/` (`models/`, `agents/`, `controllers/`, `views/`, `evaluation/`),
+   com
+   `config/`, `tests/` e `saidas/` na raiz de `trabalho-2/`. A organização segue a ADR-010 (MVC simples). *(Emenda
+   20/11: o `app.py` da raiz foi removido; o entrypoint é `views.app:main` — ADR-014.)*
 4. Dependências de execução: `agno==3.1.7`, `streamlit`, `pandas`. Desenvolvimento: `pytest`. Versões exatas resolvidas
    no `uv.lock`.
 5. **Não** criar `pedeja-simulador/` nem `requirements.txt`.

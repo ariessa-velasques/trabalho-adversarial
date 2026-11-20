@@ -62,3 +62,14 @@ Thumbs.db
 *.log
 tmp/
 .tmp/
+
+# Saídas da simulação (ADR-005)
+saidas/
+
+# Frontend (React/TypeScript)
+node_modules/
+.vite/
+src/views/web/dist/
+
+# TypeScript
+*.tsbuildinfo
