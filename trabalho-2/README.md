@@ -46,6 +46,29 @@ npm --prefix src/views/web run typecheck
 npm --prefix src/views/web run build
 ```
 
+### Testes
+
+```bash
+uv run pytest
+```
+
+A suíte padrão roda **offline**: nada dela chama rede nem exige chave de LLM. Testes que usam o LLM externo são
+marcados com `@pytest.mark.llm` e pulados sem chave no ambiente (ADR-009). Não há linter nem CI configurados.
+
+## Configuração
+
+`config/scenarios.json` é a única fonte de parâmetros (ADR-005): rodadas e coorte (`rounds`), orçamentos separados de
+plataforma e atacante (`budget`), cupom (`coupon`), limiares do bot e da AM3 (`thresholds`), custo por tática cobrado
+por tentativa (`costs`), sementes e fluxos (`seeds`), modos (`modes`), catálogo fechado de táticas (`tactics`), LLM
+opcional (`llm`) e arquivos de saída (`outputs`). Nenhum segredo entra no JSON — a chave do LLM vai no `.env`.
+
+O carregamento é validado em `src/models/config.py`; configuração inválida levanta `ConfigError` nomeando a chave e o
+valor esperado:
+
+```bash
+uv run python -c "from models.config import load_config; load_config('config/scenarios.json')"
+```
+
 ## Estrutura
 
 ```text
@@ -65,7 +88,14 @@ trabalho-2/
 │           │   └── pages/     # as cinco abas
 │           └── package.json
 └── docs/
+    └── adr/                   # decisões de arquitetura (ADR-001..014)
 ```
+
+## Decisões de arquitetura
+
+As decisões estão em [`docs/adr/ADRs.md`](docs/adr/ADRs.md), com mapa de rastreabilidade: ADR-001 (Python/uv/layout),
+ADR-005 (configuração em JSON), ADR-007 (reprodutibilidade), ADR-009 (testes), ADR-012 (economia do atacante) e
+ADR-014 (frontend React/TypeScript).
 
 ## Fonte de dados
 

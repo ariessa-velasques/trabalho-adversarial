@@ -39,3 +39,10 @@ build-backend = "uv_build"
 dev = [
     "pytest>=9.2.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "llm: teste que exige LLM externo e chave no ambiente; pulado sem chave (ADR-009)",
+]
