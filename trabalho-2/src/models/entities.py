@@ -250,21 +250,31 @@ class Event:
     ``payload`` é opaco e somente leitura; cada projeção decide, por
     whitelist, o que expõe a bot, motor e revisão (ADR-006 §1–§2).
     ``occurred_at`` é o instante simulado em horas; a sequência começa em 1 e
-    é estritamente crescente dentro da execução (ADR-007).
+    é estritamente crescente dentro da execução (ADR-007). Todo evento
+    carrega o ``run_id`` da execução, a rodada e, quando aplicável, a conta.
     """
 
     sequence: int
     round_number: int
     occurred_at: float
     event_type: EventType
+    run_id: str
     account_id: str | None = None
     payload: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        """Validação estrutural (ADR-005 §5; ADR-007).
+
+        ``run_id`` é obrigatório: todo evento canônico referencia a execução
+        que o produziu, junto de ``round_number`` e ``account_id`` — critério
+        de aceite da issue de checkout.
+        """
+
         _require_positive_int(self.sequence, "sequence")
         _require_positive_int(self.round_number, "round_number")
         _require_non_negative(self.occurred_at, "occurred_at")
         _require_enum(self.event_type, EventType, "event_type")
+        _require_text(self.run_id, "run_id")
         if self.account_id is not None:
             _require_text(self.account_id, "account_id")
         if not isinstance(self.payload, Mapping):
@@ -301,13 +311,19 @@ class SimulationState:
         """Anexa o evento ao histórico com sequência estritamente crescente.
 
         Única forma sancionada de acrescentar eventos; a ordem preserva o
-        replay (ADR-007). Levanta ``ValueError`` em sequência fora de ordem.
+        replay (ADR-007). Levanta ``ValueError`` em sequência fora de ordem
+        ou em evento de outra execução (``run_id`` divergente).
         """
 
         if self.events and event.sequence <= self.events[-1].sequence:
             raise ValueError(
                 f"event {event.sequence}: sequência deve ser estritamente "
                 f"crescente (último evento: {self.events[-1].sequence})"
+            )
+        if event.run_id != self.run_id:
+            raise ValueError(
+                f"event {event.sequence}: run_id diverge da execução "
+                f"(esperado {self.run_id!r}; obtido {event.run_id!r})"
             )
         self.events.append(event)
         return event

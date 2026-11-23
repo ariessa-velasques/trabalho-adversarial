@@ -85,6 +85,7 @@ def _event(**overrides: object) -> Event:
         "round_number": 1,
         "occurred_at": 0.5,
         "event_type": EventType.COUPON_DECIDED,
+        "run_id": "run_test",
         "account_id": "acc_001",
         "payload": {"outcome": "accepted"},
     }
@@ -362,6 +363,23 @@ def test_event_rejects_non_positive_sequence() -> None:
         _event(sequence=0)
 
 
+def test_event_requires_run_id() -> None:
+    """Todo evento canônico referencia a execução que o produziu (ADR-007)."""
+
+    with pytest.raises(ValueError, match="run_id"):
+        _event(run_id=" ")
+    with pytest.raises(ValueError, match="run_id"):
+        _event(run_id=7)  # type: ignore[arg-type]
+
+
+def test_record_event_rejects_event_of_another_run() -> None:
+    """O log de uma execução só aceita eventos do próprio ``run_id``."""
+
+    state = SimulationState(run_id="run_test", policy=_policy())
+    with pytest.raises(ValueError, match="run_id diverge"):
+        state.record_event(_event(run_id="run_other"))
+
+
 def test_event_allows_system_scope_without_account() -> None:
     """Eventos de sistema (ex.: política) não têm conta associada."""
 
@@ -383,7 +401,7 @@ def test_state_instances_are_independent() -> None:
 
     account = _account()
     first.accounts[account.account_id] = account
-    first.record_event(_event())
+    first.record_event(_event(run_id="run_a"))
     first.budget_consumed = 20.0
 
     assert second.accounts == {}
