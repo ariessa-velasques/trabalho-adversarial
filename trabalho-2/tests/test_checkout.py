@@ -35,7 +35,7 @@ from models.enums import (
     VerificationLevel,
 )
 from models.events import contestation_opened, contestation_reviewed
-from models.rules.coupon import COUPON_DISCOUNT_CENTS
+from models.rules.coupon import reais_to_cents
 
 CHECKOUT_SOURCE = Path(__file__).resolve().parents[1] / "src" / "models" / "checkout.py"
 
@@ -226,7 +226,7 @@ def test_budget_final_is_exactly_acquisition_minus_20_per_redemption(
         assert _redeem(checkout, index) is Outcome.ACCEPTED
 
     assert checkout.state.budget_consumed == pytest.approx(60.0)
-    assert checkout.state.budget_consumed == COUPON_DISCOUNT_CENTS / 100 * 3
+    assert checkout.state.budget_consumed == config.coupon.discount * 3
     remaining = config.budget.acquisition - 20.0 * 3
     assert config.budget.acquisition - checkout.state.budget_consumed == remaining
 
@@ -339,7 +339,7 @@ def test_exhausted_budget_blocks_completion_with_generic_public_response(
         if event.event_type is EventType.BUDGET_ALERT
     )
     assert alert.payload["remaining_cents"] == 1000
-    assert alert.payload["requested_discount_cents"] == COUPON_DISCOUNT_CENTS
+    assert alert.payload["requested_discount_cents"] == reais_to_cents(config.coupon.discount)
 
     # Resposta pública genérica: nada de orçamento, regra interna ou valores.
     decided = [
@@ -393,14 +393,14 @@ def test_commission_is_credited_once_in_the_redemption_event(
 
 
 # ---------------------------------------------------------------------------
-# Regra do cupom aplicada no PE2 (borda do domínio)
+# Regra do cupom aplicada no PE2 (borda do domínio e 1ª compra ≤ mínimo, I-01)
 # ---------------------------------------------------------------------------
 
 
-def test_order_at_the_minimum_is_refused_and_below_border_debits(
+def test_first_order_at_the_minimum_completes_without_discount(
     config: SimulationConfig,
 ) -> None:
-    """R$ 30,00 inelegível no PE2; R$ 30,01 resgata (AGENTS.md §6)."""
+    """R$ 30,00 na 1ª compra conclui sem desconto; R$ 30,01 resgata (AGENTS.md §6)."""
 
     below = _checkout(config)
     below.register_attempt(_attempt())
@@ -408,9 +408,12 @@ def test_order_at_the_minimum_is_refused_and_below_border_debits(
     outcome = below.complete_order(
         _order(value=30.00), _attempt(), decision, occurred_at=1.0
     )
-    assert outcome is Outcome.COUPON_ALREADY_USED
+    assert outcome is Outcome.ACCEPTED
     assert below.state.budget_consumed == pytest.approx(0.0)
     assert _redemption_events(below) == []
+    assert EventType.ORDER_COMPLETED in below.event_types()
+    assert below.state.accounts["acc_001"].first_purchase_completed is True
+    assert below.state.accounts["acc_001"].is_eligible is False
 
     above = _checkout(config)
     above.register_attempt(_attempt())
@@ -420,6 +423,42 @@ def test_order_at_the_minimum_is_refused_and_below_border_debits(
     )
     assert outcome is Outcome.ACCEPTED
     assert above.state.budget_consumed == pytest.approx(20.0)
+
+
+def test_first_purchase_below_minimum_consumes_eligibility_forever(
+    config: SimulationConfig,
+) -> None:
+    """Critério de aceite (I-01): 1ª compra de R$ 25 conclui sem desconto e
+    sem ``coupon_already_used``; um 2º pedido de R$ 50 não recebe o cupom."""
+
+    checkout = _checkout(config)
+    attempt = _attempt()
+    checkout.register_attempt(attempt)
+    decision = checkout.decide(attempt)
+    first = checkout.complete_order(_order(value=25.00), attempt, decision, occurred_at=1.0)
+
+    # Conclui sem desconto: aceito, sem débito, sem resgate e sem a recusa
+    # ``coupon_already_used`` — o cupom nunca foi usado.
+    assert first is Outcome.ACCEPTED
+    assert checkout.state.budget_consumed == pytest.approx(0.0)
+    assert _redemption_events(checkout) == []
+    outcomes = [event.payload.get("outcome") for event in checkout.state.events]
+    assert Outcome.COUPON_ALREADY_USED.value not in outcomes
+    assert EventType.ORDER_COMPLETED in checkout.event_types()
+    account = checkout.state.accounts["acc_001"]
+    assert account.first_purchase_completed is True
+    assert account.is_eligible is False
+
+    # A conta perdeu a elegibilidade para sempre: o segundo pedido, mesmo
+    # acima do mínimo, não recebe o cupom nem debita o orçamento.
+    second_attempt = _attempt(attempt_id="att_002")
+    second_decision = checkout.decide(second_attempt)
+    second = checkout.complete_order(
+        _order(order_id="ord_002", value=50.00), second_attempt, second_decision, occurred_at=2.0
+    )
+    assert second is Outcome.COUPON_ALREADY_USED
+    assert checkout.state.budget_consumed == pytest.approx(0.0)
+    assert _redemption_events(checkout) == []
 
 
 # ---------------------------------------------------------------------------
@@ -508,14 +547,39 @@ def test_checkout_module_has_no_agent_or_evaluation_imports() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Valores de configuração inconsistentes com a regra do cupom
+# Regra do cupom parametrizada pela configuração (I-01; ADR-005 §3)
 # ---------------------------------------------------------------------------
 
 
-def test_checkout_rejects_config_diverging_from_the_coupon_rule(write_config) -> None:
-    """Desconto ou mínimo divergentes da regra (R$ 20 / R$ 30) falham cedo."""
+def test_checkout_applies_the_coupon_rule_from_the_config(write_config) -> None:
+    """Desconto e mínimo vêm da configuração, não de constantes do código."""
 
-    with pytest.raises(ValueError, match="discount"):
-        _checkout(write_config(overrides={"coupon": {"discount": 25.0}})[0])
-    with pytest.raises(ValueError, match="min_order"):
-        _checkout(write_config(overrides={"coupon": {"min_order": 25.0}})[0])
+    config, _ = write_config(overrides={"coupon": {"discount": 25.0, "min_order": 40.0}})
+    checkout = _checkout(config)
+    assert checkout.rule.discount_cents == 2500
+    assert checkout.rule.min_order_cents == 4000
+
+    # Borda nova: R$ 40,00 na 1ª compra conclui sem desconto.
+    attempt = _attempt()
+    checkout.register_attempt(attempt)
+    decision = checkout.decide(attempt)
+    first = checkout.complete_order(
+        _order(value=40.00), attempt, decision, occurred_at=1.0
+    )
+    assert first is Outcome.ACCEPTED
+    assert checkout.state.budget_consumed == pytest.approx(0.0)
+    assert _redemption_events(checkout) == []
+
+    # R$ 40,01 em outra conta: resgate com o desconto configurado (R$ 25).
+    other_attempt = _attempt(attempt_id="att_002", account_id="acc_002")
+    checkout.register_attempt(other_attempt)
+    other_decision = checkout.decide(other_attempt)
+    second = checkout.complete_order(
+        _order(order_id="ord_002", account_id="acc_002", value=40.01),
+        other_attempt,
+        other_decision,
+        occurred_at=2.0,
+    )
+    assert second is Outcome.ACCEPTED
+    assert checkout.state.budget_consumed == pytest.approx(25.0)
+    assert len(_redemption_events(checkout)) == 1

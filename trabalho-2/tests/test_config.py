@@ -20,8 +20,10 @@ from tests.conftest import MINIMAL_CONFIG
 def test_loads_versioned_config(config: SimulationConfig) -> None:
     """O scenarios.json versionado carrega e reflete os valores de referência."""
 
-    assert config.rounds.count == 6
+    assert config.rounds.count == 5
+    assert config.rounds.min == 3
     assert config.rounds.days_per_round == 7
+    assert config.rounds.base_conversion == {"b1": 0.7, "b2": 0.55}
     assert config.budget.acquisition == 100000.0
     assert config.budget.attack == 5000.0
     assert config.coupon.discount == 20.0
@@ -77,6 +79,8 @@ def _payload_without(dotted: str) -> dict[str, object]:
     "missing_key",
     [
         "rounds",
+        "rounds.min",
+        "rounds.base_conversion",
         "budget.attack",
         "coupon.commission_rate",
         "thresholds.bot",
@@ -117,6 +121,8 @@ def test_empty_tactics_cost_section_is_rejected(write_config) -> None:
         ("budget.attack", True, "número"),
         ("rounds.count", 0, "maior que zero"),
         ("rounds.count", 2.5, "inteiro"),
+        ("rounds.min", 0, "maior que zero"),
+        ("rounds.min", 1.5, "inteiro"),
         ("coupon.discount", -1, "maior que zero"),
         ("coupon.commission_rate", 1.5, "entre 0 e 1"),
         ("rounds.shared_device_pct", 101, "entre 0 e 100"),
@@ -169,6 +175,49 @@ def test_unknown_top_level_key_is_rejected(write_config) -> None:
     with pytest.raises(ConfigError) as excinfo:
         write_config(MINIMAL_CONFIG, {"budgets": {"acquisition": 1.0}})
     assert "'budgets'" in str(excinfo.value)
+
+
+# ---------------------------------------------------------------------------
+# Rodadas: mínimo × máximo e conversão base (I-01)
+# ---------------------------------------------------------------------------
+
+
+def test_rounds_min_above_count_is_rejected(write_config) -> None:
+    """O mínimo de rodadas não pode superar o máximo configurado."""
+
+    with pytest.raises(ConfigError) as excinfo:
+        write_config(MINIMAL_CONFIG, {"rounds": {"min": 4}})  # count = 3 na config mínima
+    message = str(excinfo.value)
+    assert "rounds.min" in message
+    assert "rounds.count" in message
+
+
+def test_base_conversion_requires_every_verification_level(write_config) -> None:
+    """A tabela de conversão precisa cobrir todos os níveis de verificação."""
+
+    with pytest.raises(ConfigError) as excinfo:
+        write_config(MINIMAL_CONFIG, {"rounds": {"base_conversion": {"b1": 0.7}}})
+    assert "b2" in str(excinfo.value)
+
+
+def test_base_conversion_rejects_unknown_level(write_config) -> None:
+    """Nível fora do vocabulário (``VerificationLevel``) é rejeitado."""
+
+    overrides = {"rounds": {"base_conversion": {"b1": 0.7, "b2": 0.55, "b3": 0.5}}}
+    with pytest.raises(ConfigError) as excinfo:
+        write_config(MINIMAL_CONFIG, overrides)
+    assert "b3" in str(excinfo.value)
+
+
+def test_base_conversion_rejects_value_outside_unit_interval(write_config) -> None:
+    """Fração fora de [0, 1] falha nomeando a chave e o esperado."""
+
+    overrides = {"rounds": {"base_conversion": {"b1": 1.7, "b2": 0.55}}}
+    with pytest.raises(ConfigError) as excinfo:
+        write_config(MINIMAL_CONFIG, overrides)
+    message = str(excinfo.value)
+    assert "rounds.base_conversion.b1" in message
+    assert "entre 0 e 1" in message
 
 
 # ---------------------------------------------------------------------------

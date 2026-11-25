@@ -1,9 +1,11 @@
 """Regras puras do cupom ``BEMVINDO`` (AGENTS.md §6; Trabalho 1 §3; ADR-010 §2).
 
-R$ 20 de desconto na **primeira compra** com valor **estritamente maior** que
-R$ 30, pago pelo orçamento de aquisição (R$ 100.000 ≈ 5.000 resgates). Toda a
-aritmética monetária acontece em **centavos inteiros**: a borda do domínio é
-exata (``3000`` inelegível, ``3001`` elegível) e ponto flutuante não decide
+Desconto na **primeira compra** com valor **estritamente maior** que o mínimo,
+pago pelo orçamento de aquisição. Os valores do cupom (desconto e mínimo) vêm
+de ``config/scenarios.json`` — nenhum parâmetro de negócio fica fixo neste
+módulo (ADR-005 §3): eles chegam pelo ``CouponRule``, já em **centavos
+inteiros**, de modo que a borda do domínio é exata (``min_order_cents``
+inelegível, ``min_order_cents + 1`` elegível) e ponto flutuante não decide
 nada aqui. A ponte com as entidades, que carregam reais em ``float``, é
 ``reais_to_cents`` — arredondamento ao centavo mais próximo.
 
@@ -18,13 +20,10 @@ nunca é debitado duas vezes.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
+from models.config import CouponConfig
 from models.entities import Account
-
-#: Desconto do cupom: R$ 20,00 em centavos (Trabalho 1 §3).
-COUPON_DISCOUNT_CENTS = 2000
-#: Valor mínimo do pedido: R$ 30,00 em centavos; a regra exige estritamente maior.
-MIN_ORDER_VALUE_CENTS = 3000
 
 
 # ---------------------------------------------------------------------------
@@ -48,6 +47,13 @@ def _require_flag(value: bool, name: str) -> None:
         raise ValueError(f"{name}: esperado booleano")
 
 
+def _require_rule(rule: CouponRule) -> None:
+    """Falha se a regra não for um ``CouponRule`` tipado."""
+
+    if not isinstance(rule, CouponRule):
+        raise ValueError(f"rule: esperado CouponRule, obtido {type(rule).__name__}")
+
+
 # ---------------------------------------------------------------------------
 # Ponte reais (float das entidades) → centavos (int da regra)
 # ---------------------------------------------------------------------------
@@ -56,10 +62,9 @@ def _require_flag(value: bool, name: str) -> None:
 def reais_to_cents(value: float) -> int:
     """Converte reais (``float`` das entidades) em centavos inteiros.
 
-    Ponto flutuante não pode decidir a borda: ``30.01 * 100`` vale
-    ``3000.999…`` em binário, e o arredondamento ao centavo mais próximo
-    devolve exatamente ``3001``. Rejeita não numéricos, não finitos e
-    negativos.
+    Ponto flutuante não pode decidir a borda: ``30.01 * 100`` não é exato
+    em binário, e o arredondamento ao centavo mais próximo devolve o inteiro
+    correto (``3001``). Rejeita não numéricos, não finitos e negativos.
     """
 
     if not isinstance(value, (int, float)) or isinstance(value, bool):
@@ -72,12 +77,52 @@ def reais_to_cents(value: float) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Elegibilidade (primeira compra + cupom não usado + pedido > R$ 30)
+# Regra do cupom parametrizada pela configuração (ADR-005 §3)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class CouponRule:
+    """Parâmetros do cupom ``BEMVINDO`` em centavos inteiros.
+
+    Construída a partir da configuração com ``CouponRule.from_config``: o
+    desconto (R$ 20 na configuração de referência) e o pedido mínimo (R$ 30)
+    são parâmetros, não constantes deste módulo. A comparação do mínimo é
+    **estritamente maior**: ``min_order_cents`` é inelegível.
+    """
+
+    discount_cents: int
+    min_order_cents: int
+
+    def __post_init__(self) -> None:
+        _require_cents(self.discount_cents, "discount_cents")
+        if self.discount_cents < 1:
+            raise ValueError("discount_cents: esperado inteiro de centavos maior que zero")
+        _require_cents(self.min_order_cents, "min_order_cents")
+
+    @classmethod
+    def from_config(cls, coupon: CouponConfig) -> CouponRule:
+        """Converte o desconto e o mínimo configurados (reais) em centavos.
+
+        Levanta ``ValueError`` se a seção não for um ``CouponConfig`` tipado.
+        """
+
+        if not isinstance(coupon, CouponConfig):
+            raise ValueError(f"coupon: esperado CouponConfig, obtido {type(coupon).__name__}")
+        return cls(
+            discount_cents=reais_to_cents(coupon.discount),
+            min_order_cents=reais_to_cents(coupon.min_order),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Elegibilidade (primeira compra + cupom não usado + pedido acima do mínimo)
 # ---------------------------------------------------------------------------
 
 
 def is_eligible(
     *,
+    rule: CouponRule,
     first_purchase_completed: bool,
     coupon_used: bool,
     order_value_cents: int,
@@ -89,21 +134,23 @@ def is_eligible(
     - a conta nunca concluiu a primeira compra — a inelegibilidade após a
       conclusão é permanente (ADR-011 §6);
     - o cupom ainda não foi usado naquela conta;
-    - o valor do pedido é **estritamente maior** que R$ 30,00 — a borda é
-      exata em centavos: ``3000`` inelegível, ``3001`` elegível.
+    - o valor do pedido é **estritamente maior** que o mínimo da regra — a
+      borda é exata em centavos: ``min_order_cents`` inelegível,
+      ``min_order_cents + 1`` elegível.
     """
 
+    _require_rule(rule)
     _require_flag(first_purchase_completed, "first_purchase_completed")
     _require_flag(coupon_used, "coupon_used")
     _require_cents(order_value_cents, "order_value_cents")
     return (
         not first_purchase_completed
         and not coupon_used
-        and order_value_cents > MIN_ORDER_VALUE_CENTS
+        and order_value_cents > rule.min_order_cents
     )
 
 
-def is_account_eligible(account: Account, order_value_cents: int) -> bool:
+def is_account_eligible(rule: CouponRule, account: Account, order_value_cents: int) -> bool:
     """Elegibilidade a partir da entidade ``Account`` (models/entities.py).
 
     A conta já carrega as duas condições de histórico: a primeira compra
@@ -113,7 +160,9 @@ def is_account_eligible(account: Account, order_value_cents: int) -> bool:
     mínimo.
     """
 
+    _require_rule(rule)
     return is_eligible(
+        rule=rule,
         first_purchase_completed=account.first_purchase_completed,
         coupon_used=not account.is_eligible,
         order_value_cents=order_value_cents,
@@ -127,22 +176,24 @@ def is_account_eligible(account: Account, order_value_cents: int) -> bool:
 
 def discount_cents(
     *,
+    rule: CouponRule,
     first_purchase_completed: bool,
     coupon_used: bool,
     order_value_cents: int,
 ) -> int:
-    """Desconto em centavos do pedido: ``2000`` se elegível, ``0`` caso contrário.
+    """Desconto em centavos do pedido: ``rule.discount_cents`` se elegível, ``0`` se não.
 
-    O desconto é fixo (R$ 20,00) e não depende do valor do pedido — só da
-    elegibilidade.
+    O desconto é fixo e não depende do valor do pedido — só da elegibilidade.
     """
 
+    _require_rule(rule)
     eligible = is_eligible(
+        rule=rule,
         first_purchase_completed=first_purchase_completed,
         coupon_used=coupon_used,
         order_value_cents=order_value_cents,
     )
-    return COUPON_DISCOUNT_CENTS if eligible else 0
+    return rule.discount_cents if eligible else 0
 
 
 def budget_allows(discount: int, budget_remaining_cents: int) -> bool:

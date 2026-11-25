@@ -1,12 +1,17 @@
 {
   "$comment": "Única fonte de parâmetros do simulador (ADR-005 §3). Validado no carregamento por models/config.py.",
   "rounds": {
-    "count": 6,
+    "count": 5,
+    "min": 3,
     "days_per_round": 7,
     "legit_customers": 100,
     "shared_device_pct": 12,
     "shared_address_pct": 18,
-    "abandonment_pct": 8
+    "abandonment_pct": 8,
+    "base_conversion": {
+      "b1": 0.7,
+      "b2": 0.55
+    }
   },
   "budget": {
     "acquisition": 100000.0,

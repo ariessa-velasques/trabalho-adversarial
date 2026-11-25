@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
 
+from models.enums import VerificationLevel
+
 #: Seções obrigatórias do esquema (ADR-005 §3). ``llm`` e ``outputs`` são opcionais.
 REQUIRED_SECTIONS: tuple[str, ...] = (
     "rounds",
@@ -45,14 +47,23 @@ class ConfigError(ValueError):
 
 @dataclass(frozen=True)
 class RoundsConfig:
-    """Coorte e horizonte das rodadas."""
+    """Coorte, horizonte das rodadas e conversão base por nível de verificação.
+
+    ``count`` é o máximo de rodadas e ``min`` o mínimo garantido: o laço para
+    em ``count`` ou quando nenhum lado muda nada, nunca antes de ``min``
+    (plano revisado §7). ``base_conversion`` é a conversão da primeira compra
+    da coorte legítima por nível de verificação (``"b1"``/``"b2"``) — o atrito
+    da defesa se mede contra ela (Trabalho 1 §3).
+    """
 
     count: int
+    min: int
     days_per_round: int
     legit_customers: int
     shared_device_pct: float
     shared_address_pct: float
     abandonment_pct: float
+    base_conversion: dict[str, float]
 
 
 @dataclass(frozen=True)
@@ -334,13 +345,29 @@ def _enum_desc(options: tuple[str, ...]) -> str:
 def _parse_rounds(raw: dict[str, Any], source: Path) -> RoundsConfig:
     owner = "rounds"
     _reject_unknown(raw, source, owner, tuple(RoundsConfig.__dataclass_fields__))
+    count = _expect(raw, source, owner, "count", _positive_int, "inteiro maior que zero")
+    minimum = _expect(raw, source, owner, "min", _positive_int, "inteiro maior que zero")
+    if minimum > count:
+        raise ConfigError(
+            f"{source}: chave 'rounds.min' inválida (esperado: inteiro menor ou igual a "
+            f"'rounds.count'; obtido: {minimum} maior que {count})"
+        )
+    conversion_raw = _subsection(raw, "base_conversion", owner, source)
+    levels = tuple(sorted(level.value for level in VerificationLevel))
+    _reject_unknown(conversion_raw, source, f"{owner}.base_conversion", levels)
+    base_conversion = {
+        level: _expect(conversion_raw, source, f"{owner}.base_conversion", level, _fraction, "fração entre 0 e 1")
+        for level in levels
+    }
     return RoundsConfig(
-        count=_expect(raw, source, owner, "count", _positive_int, "inteiro maior que zero"),
+        count=count,
+        min=minimum,
         days_per_round=_expect(raw, source, owner, "days_per_round", _positive_int, "inteiro maior que zero"),
         legit_customers=_expect(raw, source, owner, "legit_customers", _non_negative, "número maior ou igual a zero"),
         shared_device_pct=_expect(raw, source, owner, "shared_device_pct", _pct, "percentual entre 0 e 100"),
         shared_address_pct=_expect(raw, source, owner, "shared_address_pct", _pct, "percentual entre 0 e 100"),
         abandonment_pct=_expect(raw, source, owner, "abandonment_pct", _pct, "percentual entre 0 e 100"),
+        base_conversion=base_conversion,
     )
 
 

@@ -38,6 +38,7 @@ __all__ = [
     "coupon_decided",
     "contestation_opened",
     "contestation_reviewed",
+    "order_completed",
     "rate_limited",
     "redemption_completed",
     "verification_requested",
@@ -224,6 +225,45 @@ def budget_alert(
 # ---------------------------------------------------------------------------
 # PE2: conclusão do pedido e resgate
 # ---------------------------------------------------------------------------
+
+
+def order_completed(
+    state: SimulationState,
+    attempt: Attempt,
+    order: Order,
+    *,
+    occurred_at: float,
+) -> Event:
+    """Pedido concluído sem resgate do cupom (PE2).
+
+    Registra a primeira compra de valor até o mínimo do cupom: o pedido é
+    concluído **sem desconto** e a conta perde a elegibilidade para sempre —
+    o cupom vale só para a primeira compra (decisão do grupo, plano revisado
+    §11). Nada é debitado do orçamento e não há ``redemption_completed``;
+    este evento é o registro auditável da conclusão.
+    """
+
+    _check_state_and_attempt(state, attempt)
+    if not isinstance(order, Order):
+        raise ValueError(f"order: esperado Order, obtido {type(order).__name__}")
+    if order.account_id != attempt.account_id:
+        raise ValueError(
+            f"order {order.order_id}: conta diverge da tentativa "
+            f"(esperado {attempt.account_id!r}; obtido {order.account_id!r})"
+        )
+    return _append(
+        state,
+        event_type=EventType.ORDER_COMPLETED,
+        round_number=attempt.round_number,
+        occurred_at=occurred_at,
+        account_id=attempt.account_id,
+        payload={
+            "attempt_id": attempt.attempt_id,
+            "order_id": order.order_id,
+            "order_value": order.value,
+            "discount": 0.0,
+        },
+    )
 
 
 def redemption_completed(

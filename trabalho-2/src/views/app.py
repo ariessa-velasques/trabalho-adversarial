@@ -1,8 +1,10 @@
 """Entrypoint local do laboratório adversarial do PedeJá.
 
 O frontend vive em ``src/views/web`` (React + TypeScript). Em produção local,
-`uv run trabalho-2` serve o build estático gerado por ``npm run build`` com a
-biblioteca padrão do Python — sem FastAPI, sem segundo processo.
+`uv run python -m views.app` serve o build estático gerado por ``npm run build``
+com a biblioteca padrão do Python — sem FastAPI, sem segundo processo. O
+console script ``trabalho-2`` foi retirado na I-01 e volta na I-08 como CLI do
+simulador (``main.py``).
 
 Para desenvolver a interface com recarga imediata, use ``npm run dev`` dentro de
 ``src/views/web``.

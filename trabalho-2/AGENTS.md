@@ -25,15 +25,19 @@ Se código e documento divergirem, adapte o código e registre a divergência; n
 ## 3. Estado atual
 
 - Python **3.12.16**, gerenciado por `uv`; Node 22 e npm 10 para o frontend.
-- Dependências Python: `agno==3.1.7` e `pandas==3.1.1`; dev: `pytest==9.2.0`. O `streamlit` foi removido (ADR-014).
+- Dependências Python: `agno[anthropic,groq,sqlite]==3.1.7` (o extra `sqlite` traz o `sqlalchemy` exigido pelo
+  `SqliteDb`), `pandas>=3.1.1` e `python-dotenv`; dev: `pytest`. O `streamlit` foi removido (ADR-014).
 - Dependências do frontend em `src/views/web/package.json` (React 19, Vite 7, Tailwind CSS 4).
 - `src/` contém os pacotes de topo `models/`, `agents/`, `controllers/`, `views/` e `evaluation/`.
 - As cinco telas estão implementadas em `src/views/web/src/` com dados sintéticos determinísticos; a fonte está
-  isolada atrás de `SimulatorSource`.
-- `src/views/app.py` é o único entrypoint Python e serve o build estático. `uv run trabalho-2` funciona depois de
-  `npm --prefix src/views/web run build`; não existe `app.py` na raiz.
-- O backend Python (`models/`, `agents/`, `controllers/`, `evaluation/`), `config/scenarios.json` e `tests/` continuam
-  pendentes.
+  isolada atrás de `SimulatorSource`. **Decisão do grupo (I-01): o front e `docs/prototipo_interface/` permanecem
+  versionados** — não foram removidos; a ligação com dados reais fica para depois, e a ADR-014 será marcada como
+  "adiada" na I-02.
+- `src/views/app.py` serve o build estático do front (`uv run python -m views.app`). O console script `trabalho-2`
+  foi **removido na I-01** (dependia do front) e volta na I-08 apontando para o `main.py` do simulador.
+- `models/` (config, entidades, enums, regras do cupom, cenários, eventos e checkout) e `tests/` (163 testes offline)
+  estão implementados. `agents/`, `controllers/` e `evaluation/` continuam esqueletos; `models/observations.py`
+  (projeções `PublicView`/`OperationalView`/`EvaluationView`) pertence à I-03 (#28).
 
 ## 4. Comandos
 
@@ -45,9 +49,8 @@ npm --prefix src/views/web install
 npm --prefix src/views/web run dev       # Vite com recarga
 npm --prefix src/views/web run typecheck # tsc estrito
 npm --prefix src/views/web run build     # gera src/views/web/dist
-uv run trabalho-2                        # serve o build em :8501
-uv run python -m views.app               # equivalente, sem console script
-uv run pytest                            # quando tests/ existir
+uv run python -m views.app               # serve o build do front em :8501
+uv run pytest                            # suíte offline (163 testes)
 uv build --wheel
 ```
 
@@ -80,11 +83,16 @@ Não use `pip`, virtualenv manual ou `requirements.txt`. `uv` gerencia Python; o
 
 ## 6. Invariantes de domínio
 
-- Cupom: **R$ 20 de desconto no primeiro pedido com valor estritamente maior que R$ 30**.
+- Cupom: **R$ 20 de desconto no primeiro pedido com valor estritamente maior que R$ 30** (valores de referência;
+  desconto e mínimo vêm de `coupon` em `config/scenarios.json` — não há constantes de negócio em `models/`).
 - O orçamento é debitado **somente quando o pedido é concluído**.
 - Borda: **R$ 30,00 inelegível; R$ 30,01 elegível**.
+- **Primeira compra de valor até o mínimo (decisão do grupo, plano revisado §11):** o pedido é concluído **sem
+  desconto**, a conta perde a elegibilidade para sempre e a resposta **não** é `coupon_already_used` — o cupom
+  nunca foi usado. O checkout registra `order_completed` com `discount = 0`.
 - Uma conta que concluiu a primeira compra **nunca** volta a ser elegível.
-- Três ou mais rodadas conectadas, com estado persistindo entre elas.
+- Rodadas conectadas com estado persistindo entre elas: **mínimo 3, máximo 5** (`rounds.min`/`rounds.count` na
+  config; a conversão base 70 %/55 % da coorte vem de `rounds.base_conversion`).
 - Controles da AM3: **mensagem genérica**, **limite de 3 tentativas por 24 h simuladas**, **detecção de sondagem** e
   **canal de contestação**.
 - Configurações de defesa comparadas: **B1 fixa**, **B2 fixa** e o **redesenho da seção 5**.
@@ -119,7 +127,7 @@ Não use `pip`, virtualenv manual ou `requirements.txt`. `uv` gerencia Python; o
 A suíte padrão roda **offline**. Testes que usam LLM são marcados como `llm` e pulados sem chave.
 
 O frontend tem verificação de tipos (`npm --prefix src/views/web run typecheck`) e build. Não há linter ou CI
-configurados: **não afirme que lint ou CI passam**. A suíte `pytest` ainda será criada.
+configurados: **não afirme que lint ou CI passam**. A suíte `pytest` roda offline com 163 testes.
 
 ## 9. Não faça
 

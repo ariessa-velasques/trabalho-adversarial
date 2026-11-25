@@ -1,8 +1,10 @@
 """Testes das regras puras do cupom (models/rules/coupon.py; AGENTS.md §6).
 
-A borda do domínio é exata: R$ 30,00 (3000 centavos) é inelegível e
-R$ 30,01 (3001 centavos) é elegível. Todo o dinheiro vive em centavos
-inteiros; ponto flutuante só entra como ponte de conversão.
+Desconto e mínimo são parâmetros vindos da configuração (``CouponRule``),
+não constantes do módulo (ADR-005 §3; I-01). A borda do domínio é exata:
+com o mínimo de R$ 30,00 (3000 centavos), R$ 30,00 é inelegível e R$ 30,01
+(3001 centavos) é elegível. Todo o dinheiro vive em centavos inteiros;
+ponto flutuante só entra como ponte de conversão.
 """
 
 from __future__ import annotations
@@ -12,10 +14,10 @@ from pathlib import Path
 
 import pytest
 
+from models.config import CouponConfig
 from models.entities import Account
 from models.rules.coupon import (
-    COUPON_DISCOUNT_CENTS,
-    MIN_ORDER_VALUE_CENTS,
+    CouponRule,
     budget_allows,
     debit_budget,
     discount_cents,
@@ -25,6 +27,9 @@ from models.rules.coupon import (
 )
 
 COUPON_SOURCE = Path(__file__).resolve().parents[1] / "src" / "models" / "rules" / "coupon.py"
+
+#: Regra de referência dos testes: R$ 20 de desconto, mínimo de R$ 30 (T1 §3).
+RULE = CouponRule(discount_cents=2000, min_order_cents=3000)
 
 
 # ---------------------------------------------------------------------------
@@ -36,6 +41,7 @@ def _order_kwargs(**overrides: object) -> dict[str, object]:
     """Pedido de referência elegível: primeira compra, cupom livre, R$ 41,90."""
 
     fields: dict[str, object] = {
+        "rule": RULE,
         "first_purchase_completed": False,
         "coupon_used": False,
         "order_value_cents": 4190,
@@ -45,15 +51,33 @@ def _order_kwargs(**overrides: object) -> dict[str, object]:
 
 
 # ---------------------------------------------------------------------------
-# Constantes do domínio
+# Regra parametrizada pela configuração (I-01; ADR-005 §3)
 # ---------------------------------------------------------------------------
 
 
-def test_constants_match_the_domain_rule() -> None:
-    """R$ 20 de desconto e mínimo de R$ 30, em centavos (Trabalho 1 §3)."""
+def test_rule_comes_from_configuration() -> None:
+    """Desconto e mínimo chegam da config, convertidos em centavos inteiros."""
 
-    assert COUPON_DISCOUNT_CENTS == 2000
-    assert MIN_ORDER_VALUE_CENTS == 3000
+    rule = CouponRule.from_config(CouponConfig(discount=20.0, min_order=30.0, commission_rate=0.2))
+    assert rule.discount_cents == 2000
+    assert rule.min_order_cents == 3000
+
+    custom = CouponRule.from_config(CouponConfig(discount=25.0, min_order=40.0, commission_rate=0.2))
+    assert custom.discount_cents == 2500
+    assert custom.min_order_cents == 4000
+
+
+def test_rule_validation_rejects_invalid_values() -> None:
+    """A regra exige desconto inteiro positivo e mínimo não negativo."""
+
+    with pytest.raises(ValueError, match="discount_cents"):
+        CouponRule(discount_cents=0, min_order_cents=3000)
+    with pytest.raises(ValueError, match="discount_cents"):
+        CouponRule(discount_cents=-100, min_order_cents=3000)
+    with pytest.raises(ValueError, match="min_order_cents"):
+        CouponRule(discount_cents=2000, min_order_cents=-1)
+    with pytest.raises(ValueError, match="coupon"):
+        CouponRule.from_config("not_a_coupon_config")  # type: ignore[arg-type]
 
 
 # ---------------------------------------------------------------------------
@@ -78,6 +102,14 @@ def test_minimum_order_border_is_exact(order_value_cents: int, expected: bool) -
     assert is_eligible(**_order_kwargs(order_value_cents=order_value_cents)) is expected
 
 
+def test_border_follows_the_configured_minimum() -> None:
+    """A borda acompanha o mínimo da regra, não um valor fixo (I-01)."""
+
+    custom = CouponRule(discount_cents=1500, min_order_cents=2500)
+    assert is_eligible(**_order_kwargs(rule=custom, order_value_cents=2500)) is False
+    assert is_eligible(**_order_kwargs(rule=custom, order_value_cents=2501)) is True
+
+
 def test_order_below_the_minimum_gets_no_discount() -> None:
     """Pedido abaixo do mínimo é inelegível e não gera desconto."""
 
@@ -99,8 +131,8 @@ def test_account_with_previous_purchase_is_never_eligible_again() -> None:
 
     # Pela entidade: a transição de conclusão é permanente (ADR-011 §6).
     account = Account(account_id="acc_001").complete_first_purchase()
-    assert is_account_eligible(account, MIN_ORDER_VALUE_CENTS + 1) is False
-    assert is_account_eligible(account, 100_000) is False
+    assert is_account_eligible(RULE, account, RULE.min_order_cents + 1) is False
+    assert is_account_eligible(RULE, account, 100_000) is False
 
 
 def test_coupon_already_used_in_the_same_account_is_ineligible() -> None:
@@ -117,9 +149,16 @@ def test_coupon_already_used_in_the_same_account_is_ineligible() -> None:
 
 
 def test_discount_is_paid_only_for_eligible_orders() -> None:
-    """Pedido elegível recebe exatamente R$ 20,00."""
+    """Pedido elegível recebe exatamente o desconto da regra."""
 
-    assert discount_cents(**_order_kwargs()) == COUPON_DISCOUNT_CENTS
+    assert discount_cents(**_order_kwargs()) == RULE.discount_cents
+
+
+def test_discount_follows_the_configured_value() -> None:
+    """O desconto concedido é o da regra configurada (I-01)."""
+
+    custom = CouponRule(discount_cents=1500, min_order_cents=3000)
+    assert discount_cents(**_order_kwargs(rule=custom)) == 1500
 
 
 def test_discount_is_zero_for_every_ineligible_case() -> None:
@@ -144,7 +183,7 @@ def test_reais_to_cents_preserves_the_exact_border() -> None:
 
     assert reais_to_cents(30.00) == 3000
     assert reais_to_cents(30.01) == 3001
-    assert reais_to_cents(20.00) == COUPON_DISCOUNT_CENTS
+    assert reais_to_cents(20.00) == RULE.discount_cents
     assert reais_to_cents(41.90) == 4190
 
 
@@ -152,8 +191,8 @@ def test_float_order_value_is_judged_in_cents() -> None:
     """Pedido em reais (``float`` da entidade) é julgado em centavos exatos."""
 
     account = Account(account_id="acc_001")
-    assert is_account_eligible(account, reais_to_cents(30.00)) is False
-    assert is_account_eligible(account, reais_to_cents(30.01)) is True
+    assert is_account_eligible(RULE, account, reais_to_cents(30.00)) is False
+    assert is_account_eligible(RULE, account, reais_to_cents(30.01)) is True
 
 
 @pytest.mark.parametrize("value", [-0.01, float("nan"), float("inf"), "30.00", True])
@@ -173,9 +212,9 @@ def test_debit_happens_only_when_the_order_completes() -> None:
     """Critério de aceite: pedido não concluído deixa o orçamento intocado."""
 
     budget_consumed = 0
-    assert debit_budget(budget_consumed, COUPON_DISCOUNT_CENTS, order_completed=False) == 0
-    assert debit_budget(budget_consumed, COUPON_DISCOUNT_CENTS, order_completed=True) == (
-        COUPON_DISCOUNT_CENTS
+    assert debit_budget(budget_consumed, RULE.discount_cents, order_completed=False) == 0
+    assert debit_budget(budget_consumed, RULE.discount_cents, order_completed=True) == (
+        RULE.discount_cents
     )
 
 
@@ -186,13 +225,14 @@ def test_debit_is_unique_per_account() -> None:
     budget_consumed = 0
 
     # Primeiro pedido: elegível e concluído — o desconto entra no orçamento.
-    assert is_account_eligible(account, 4190) is True
-    budget_consumed = debit_budget(budget_consumed, COUPON_DISCOUNT_CENTS, order_completed=True)
-    assert budget_consumed == COUPON_DISCOUNT_CENTS
+    assert is_account_eligible(RULE, account, 4190) is True
+    budget_consumed = debit_budget(budget_consumed, RULE.discount_cents, order_completed=True)
+    assert budget_consumed == RULE.discount_cents
     account = account.complete_first_purchase()
 
     # Segundo pedido da mesma conta: sem desconto e, portanto, sem débito.
     second_discount = discount_cents(
+        rule=RULE,
         first_purchase_completed=account.first_purchase_completed,
         coupon_used=not account.is_eligible,
         order_value_cents=4190,
@@ -206,17 +246,17 @@ def test_debit_is_unique_per_account() -> None:
 def test_zeroed_budget_cannot_fund_a_redemption() -> None:
     """Orçamento zerado (ou reste menor que o desconto) não paga mais resgate."""
 
-    assert budget_allows(COUPON_DISCOUNT_CENTS, budget_remaining_cents=0) is False
-    assert budget_allows(COUPON_DISCOUNT_CENTS, budget_remaining_cents=1999) is False
-    assert budget_allows(COUPON_DISCOUNT_CENTS, budget_remaining_cents=2000) is True
+    assert budget_allows(RULE.discount_cents, budget_remaining_cents=0) is False
+    assert budget_allows(RULE.discount_cents, budget_remaining_cents=1999) is False
+    assert budget_allows(RULE.discount_cents, budget_remaining_cents=2000) is True
 
 
 def test_full_acquisition_budget_funds_five_thousand_redemptions() -> None:
     """R$ 100.000 de aquisição cobrem exatamente 5.000 resgates de R$ 20."""
 
     budget_total_cents = reais_to_cents(100_000.00)
-    assert budget_total_cents // COUPON_DISCOUNT_CENTS == 5000
-    assert budget_allows(COUPON_DISCOUNT_CENTS, budget_remaining_cents=budget_total_cents) is True
+    assert budget_total_cents // RULE.discount_cents == 5000
+    assert budget_allows(RULE.discount_cents, budget_remaining_cents=budget_total_cents) is True
 
 
 # ---------------------------------------------------------------------------
@@ -233,8 +273,10 @@ def test_rule_inputs_are_validated() -> None:
         is_eligible(**_order_kwargs(order_value_cents=3000.0))  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="first_purchase_completed"):
         is_eligible(**_order_kwargs(first_purchase_completed=1))  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="rule"):
+        is_eligible(**_order_kwargs(rule=None))  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="budget_consumed_cents"):
-        debit_budget(-1, COUPON_DISCOUNT_CENTS, order_completed=True)
+        debit_budget(-1, RULE.discount_cents, order_completed=True)
     with pytest.raises(ValueError, match="discount"):
         debit_budget(0, -1, order_completed=True)
 

@@ -20,7 +20,6 @@ from models.config import SimulationConfig
 from models.entities import Account
 from models.enums import VerificationLevel
 from models.scenarios import (
-    BASE_CONVERSION,
     FRAUD_PERSON_ID,
     BotPlan,
     CohortProfile,
@@ -29,6 +28,7 @@ from models.scenarios import (
     LegitPlan,
     RoundPopulation,
     RoundScenario,
+    base_conversion_from_config,
     completes_first_purchase,
     generate_round_scenario,
     scenarios_rng,
@@ -285,11 +285,21 @@ def test_account_ids_do_not_repeat_and_are_neutral(config: SimulationConfig) -> 
 # ---------------------------------------------------------------------------
 
 
-def test_base_conversion_matches_the_reference_scenario() -> None:
-    """Conversão base configurável: 70% em B1 e 55% em B2 (Trabalho 1 §3)."""
+def test_base_conversion_comes_from_the_configuration(config: SimulationConfig) -> None:
+    """Conversão base vem da config: 70% em B1 e 55% em B2 (I-01; T1 §3)."""
 
-    assert BASE_CONVERSION[VerificationLevel.B1] == pytest.approx(0.70)
-    assert BASE_CONVERSION[VerificationLevel.B2] == pytest.approx(0.55)
+    table = base_conversion_from_config(config)
+    assert table[VerificationLevel.B1] == pytest.approx(0.70)
+    assert table[VerificationLevel.B2] == pytest.approx(0.55)
+
+
+def test_base_conversion_reflects_configured_values(write_config) -> None:
+    """A tabela acompanha os valores configurados, não constantes (I-01)."""
+
+    config, _ = write_config(overrides={"rounds": {"base_conversion": {"b1": 0.9, "b2": 0.4}}})
+    table = base_conversion_from_config(config)
+    assert table[VerificationLevel.B1] == pytest.approx(0.90)
+    assert table[VerificationLevel.B2] == pytest.approx(0.40)
 
 
 def test_b2_friction_drops_conversion_monotonically(config: SimulationConfig) -> None:
@@ -298,9 +308,10 @@ def test_b2_friction_drops_conversion_monotonically(config: SimulationConfig) ->
     scenario = _scenario(config)
     legit = scenario.population.legit
     total = len(legit)
+    table = base_conversion_from_config(config)
 
-    completes_b1 = [completes_first_purchase(plan, VerificationLevel.B1) for plan in legit]
-    completes_b2 = [completes_first_purchase(plan, VerificationLevel.B2) for plan in legit]
+    completes_b1 = [completes_first_purchase(plan, VerificationLevel.B1, base_conversion=table) for plan in legit]
+    completes_b2 = [completes_first_purchase(plan, VerificationLevel.B2, base_conversion=table) for plan in legit]
 
     assert total > 0
     assert sum(completes_b1) / total == pytest.approx(0.70, abs=0.10)
@@ -324,11 +335,12 @@ def test_conversion_function_validates_inputs(config: SimulationConfig) -> None:
 
     scenario = _scenario(config)
     plan = scenario.population.legit[0]
+    table = base_conversion_from_config(config)
 
     with pytest.raises(ValueError, match="plan"):
-        completes_first_purchase("not_a_plan", VerificationLevel.B1)  # type: ignore[arg-type]
+        completes_first_purchase("not_a_plan", VerificationLevel.B1, base_conversion=table)  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="verification_level"):
-        completes_first_purchase(plan, "b1")  # type: ignore[arg-type]
+        completes_first_purchase(plan, "b1", base_conversion=table)  # type: ignore[arg-type]
     with pytest.raises(ValueError, match="base_conversion"):
         completes_first_purchase(plan, VerificationLevel.B1, base_conversion={})
 

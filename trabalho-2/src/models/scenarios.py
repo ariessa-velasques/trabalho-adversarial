@@ -16,10 +16,12 @@ Perfis da coorte legítima (P3):
 - parte das pessoas únicas divide um aparelho de trabalho com colegas.
 
 Parte da coorte pretende comprar acima do mínimo do cupom e parte abaixo —
-quem compra abaixo de R$ 30 sofre o atrito da verificação sem poder resgatar
+quem compra abaixo do mínimo sofre o atrito da verificação sem poder resgatar
 nada. A conversão base é configurável por nível de verificação
-(``BASE_CONVERSION``: 70% em B1, 55% em B2) e o motor a usa para medir atrito
-(``completes_first_purchase``).
+(``rounds.base_conversion`` em ``config/scenarios.json``: 70% em B1 e 55% em
+B2 na configuração de referência) e o motor a usa para medir atrito
+(``completes_first_purchase``). As faixas de pedido derivam do mínimo
+configurado — nenhum valor de negócio fica fixo no código (ADR-005 §3).
 
 A geração é determinística a partir da ``master_seed``: cada rodada usa um
 fluxo próprio derivado do stream ``scenarios`` (ADR-007 §1), de modo que gerar
@@ -48,6 +50,7 @@ from typing import Mapping
 from models.config import SimulationConfig
 from models.entities import Account
 from models.enums import VerificationLevel
+from models.rules.coupon import reais_to_cents
 
 #: Nome do stream de aleatoriedade dos cenários (ADR-007 §1).
 STREAM = "scenarios"
@@ -56,32 +59,20 @@ STREAM = "scenarios"
 #: um jogador só (Trabalho 1 §3); o mapa pessoa↔conta revela isso ao avaliador.
 FRAUD_PERSON_ID = "person_fraud"
 
-#: Conversão base da primeira compra por nível de verificação (Trabalho 1 §3):
-#: 70% em B1; a verificação rígida derruba para 55%. O redesenho da seção 5
-#: herda a base de B2 — os controles da AM3 modulam o atrito além desta base.
-BASE_CONVERSION: Mapping[VerificationLevel, float] = MappingProxyType(
-    {
-        VerificationLevel.B1: 0.70,
-        VerificationLevel.B2: 0.55,
-    }
-)
-
 #: Fração da coorte legítima que pretende comprar acima do mínimo do cupom;
-#: as demais pedem abaixo de R$ 30 e não têm resgate a perder.
+#: as demais pedem abaixo do mínimo e não têm resgate a perder.
 ABOVE_MIN_ORDER_SHARE = 0.65
 
 #: Entre os domicílios com endereço compartilhado, fração que é família
 #: (o restante é república).
 FAMILY_SHARE_OF_SHARED = 0.60
 
-#: Pedido legítimo acima do mínimo: R$ 30,01 a R$ 120,00 (em centavos).
-_LEGIT_ABOVE_CENTS = (3001, 12000)
-#: Pedido legítimo abaixo do mínimo: R$ 5,00 a R$ 30,00 — R$ 30,00 exato é a
-#: borda inelegível e entra na coorte de propósito (AGENTS.md §6).
-_LEGIT_BELOW_CENTS = (500, 3000)
-#: Pedido do bot: sempre acima do mínimo — conta que pede abaixo de R$ 30 não
-#: resgata nada e não otimiza o ataque.
-_BOT_ORDER_CENTS = (3001, 9000)
+#: Piso do pedido legítimo: R$ 5,00 (em centavos). As demais faixas derivam do
+#: mínimo do cupom configurado: pedido acima do mínimo vai de
+#: ``min_order_cents + 1`` a 4× o mínimo (bot: 3×); pedido abaixo vai do piso
+#: ao mínimo exato — a borda inelegível entra na coorte de propósito
+#: (AGENTS.md §6).
+_LEGIT_ORDER_FLOOR_CENTS = 500
 
 
 # ---------------------------------------------------------------------------
@@ -200,8 +191,9 @@ class LegitPlan:
 
     ``conversion_draw`` é o único estado de atrito: a primeira compra é
     concluída quando o sorteio fica abaixo da conversão base do nível de
-    verificação vigente (``completes_first_purchase``). Como 0.55 < 0.70, as
-    conclusões sob B2 formam um subconjunto estrito das conclusões sob B1 —
+    verificação vigente (``completes_first_purchase``). Na configuração de
+    referência a conversão de B2 é menor que a de B1, de modo que as
+    conclusões sob B2 formam um subconjunto das conclusões sob B1 —
     verificação extra só adiciona abandono, nunca recupera cliente.
     """
 
@@ -353,34 +345,54 @@ class RoundScenario:
 
 
 # ---------------------------------------------------------------------------
-# Atrito do checkout: conversão base por nível de verificação
+# Atrito do checkout: conversão base por nível de verificação (da configuração)
 # ---------------------------------------------------------------------------
+
+
+def base_conversion_from_config(config: SimulationConfig) -> Mapping[VerificationLevel, float]:
+    """Tabela tipada de conversão base, lida de ``rounds.base_conversion``.
+
+    A configuração carrega as frações pelo valor do nível (``"b1"``/``"b2"``);
+    esta ponte devolve o mapeamento por ``VerificationLevel`` consumido por
+    ``completes_first_purchase`` e pelo motor ao medir atrito (Trabalho 1 §3).
+    """
+
+    if not isinstance(config, SimulationConfig):
+        raise ValueError(f"config: esperado SimulationConfig, obtido {type(config).__name__}")
+    return MappingProxyType(
+        {
+            VerificationLevel(key): value
+            for key, value in sorted(config.rounds.base_conversion.items())
+        }
+    )
 
 
 def completes_first_purchase(
     plan: LegitPlan,
     verification_level: VerificationLevel,
     *,
-    base_conversion: Mapping[VerificationLevel, float] | None = None,
+    base_conversion: Mapping[VerificationLevel, float],
 ) -> bool:
     """O cliente legítimo conclui a primeira compra sob o nível vigente?
 
-    Ponto único onde a conversão base vira atrito (Trabalho 1 §3): sob B1 a
-    coorte converte 70%; sob B2, 55%. O motor compara a conversão observada
-    com esta base para medir o atrito da própria política. O sorteio é da
-    geração da coorte — o resultado é determinístico por seed (ADR-007).
+    Ponto único onde a conversão base vira atrito (Trabalho 1 §3): na
+    configuração de referência a coorte converte 70% sob B1 e 55% sob B2. A
+    tabela vem da configuração (``base_conversion_from_config``) e pode ser
+    substituída para calibrar o redesenho. O motor compara a conversão
+    observada com esta base para medir o atrito da própria política. O
+    sorteio é da geração da coorte — o resultado é determinístico por seed
+    (ADR-007).
     """
 
     if not isinstance(plan, LegitPlan):
         raise ValueError("plan: esperado LegitPlan de models/scenarios.py")
     if not isinstance(verification_level, VerificationLevel):
         raise ValueError("verification_level: esperado VerificationLevel")
-    table = BASE_CONVERSION if base_conversion is None else base_conversion
-    if verification_level not in table:
+    if verification_level not in base_conversion:
         raise ValueError(
             f"base_conversion: sem conversão base para {verification_level.value!r}"
         )
-    return plan.conversion_draw < table[verification_level]
+    return plan.conversion_draw < base_conversion[verification_level]
 
 
 # ---------------------------------------------------------------------------
@@ -454,12 +466,16 @@ def _draw_shared_households(rng: random.Random, *, shared_target: int) -> list[_
     return households
 
 
-def _draw_order_value(rng: random.Random) -> float:
-    """Pedido pretendido de um legítimo: acima ou abaixo do mínimo do cupom."""
+def _draw_order_value(rng: random.Random, *, min_order_cents: int) -> float:
+    """Pedido pretendido de um legítimo: acima ou abaixo do mínimo do cupom.
+
+    As faixas derivam do mínimo configurado: acima, até 4× o mínimo; abaixo,
+    do piso ao mínimo exato (a borda inelegível entra de propósito).
+    """
 
     if rng.random() < ABOVE_MIN_ORDER_SHARE:
-        return rng.randint(*_LEGIT_ABOVE_CENTS) / 100
-    return rng.randint(*_LEGIT_BELOW_CENTS) / 100
+        return rng.randint(min_order_cents + 1, min_order_cents * 4) / 100
+    return rng.randint(_LEGIT_ORDER_FLOOR_CENTS, min_order_cents) / 100
 
 
 def _draw_legit_cohort(
@@ -468,6 +484,7 @@ def _draw_legit_cohort(
     count: int,
     shared_device_pct: float,
     shared_address_pct: float,
+    min_order_cents: int,
 ) -> _LegitCohort:
     """Desenha a coorte legítima da rodada: perfis, grupos e pedidos.
 
@@ -528,7 +545,7 @@ def _draw_legit_cohort(
                     profile=household.profile,
                     household_index=index,
                     device_group=None,
-                    order_value=_draw_order_value(rng),
+                    order_value=_draw_order_value(rng, min_order_cents=min_order_cents),
                     conversion_draw=rng.random(),
                 )
             )
@@ -561,20 +578,27 @@ def _draw_legit_cohort(
     )
 
 
-def _draw_bot_seeds(rng: random.Random, *, count: int, tactic_signal: str) -> list[_BotSeed]:
+def _draw_bot_seeds(
+    rng: random.Random,
+    *,
+    count: int,
+    tactic_signal: str,
+    min_order_cents: int,
+) -> list[_BotSeed]:
     """Identidades provisórias do bot na rodada.
 
     Cada conta nasce com o sinal da tática escolhida e pedidos acima do
-    mínimo. Aparelho e endereço vêm de pool compartilhado com a coorte e são
-    únicos por conta — identidade nova a cada cadastro, o comportamento do
-    emulador (config.tactics.catalog). Reuso deliberado de identidade é
-    decisão de tática e cabe ao executor, não à geração da população.
+    mínimo configurado (até 3× o mínimo). Aparelho e endereço vêm de pool
+    compartilhado com a coorte e são únicos por conta — identidade nova a
+    cada cadastro, o comportamento do emulador (config.tactics.catalog).
+    Reuso deliberado de identidade é decisão de tática e cabe ao executor,
+    não à geração da população.
     """
 
     return [
         _BotSeed(
             signals=frozenset({tactic_signal}),
-            order_value=rng.randint(*_BOT_ORDER_CENTS) / 100,
+            order_value=rng.randint(min_order_cents + 1, min_order_cents * 3) / 100,
         )
         for _ in range(count)
     ]
@@ -608,14 +632,21 @@ def generate_round_scenario(
 
     rng = scenarios_rng(config.seeds.master, round_number)
     rounds = config.rounds
+    min_order_cents = reais_to_cents(config.coupon.min_order)
 
     legit = _draw_legit_cohort(
         rng,
         count=rounds.legit_customers,
         shared_device_pct=rounds.shared_device_pct,
         shared_address_pct=rounds.shared_address_pct,
+        min_order_cents=min_order_cents,
     )
-    bot_seeds = _draw_bot_seeds(rng, count=bot_count, tactic_signal=tactic_signal)
+    bot_seeds = _draw_bot_seeds(
+        rng,
+        count=bot_count,
+        tactic_signal=tactic_signal,
+        min_order_cents=min_order_cents,
+    )
 
     # Identificadores saem de pools embaralhados pela seed: a ordem dos ids
     # não revela quem é bot nem quem divide aparelho ou endereço com quem.

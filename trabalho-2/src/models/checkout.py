@@ -9,10 +9,14 @@ anexa eventos canônicos ao log de ``models/events.py``.
 Invariantes de orçamento (AGENTS.md §6):
 
 - o orçamento de aquisição é debitado **uma única vez, na conclusão** do
-  pedido; recusa, verificação pedida ou pedido abaixo do mínimo não debita;
-- o desconto de R$ 20 não é cobrado duas vezes: a conclusão consome a
+  pedido; recusa, verificação pedida ou conclusão sem desconto não debita;
+- o desconto configurado não é cobrado duas vezes: a conclusão consome a
   elegibilidade da conta de forma permanente
   (``Account.complete_first_purchase``);
+- a primeira compra de valor até o mínimo é **concluída sem desconto** e
+  fecha a elegibilidade da conta para sempre — o cupom vale só para a
+  primeira compra (decisão do grupo, plano revisado §11) — sem responder
+  ``coupon_already_used``, porque o cupom nunca foi usado;
 - a comissão configurada sobre o pedido é creditada no mesmo evento do
   resgate (``redemption_completed``), uma única vez;
 - orçamento esgotado bloqueia novas conclusões com resposta pública
@@ -33,7 +37,7 @@ implementação em ``agents/engine.py``), a persistência dos eventos em disco
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
 from models.config import SimulationConfig
@@ -43,13 +47,13 @@ from models.events import (
     account_created,
     budget_alert,
     coupon_decided,
+    order_completed,
     rate_limited,
     redemption_completed,
     verification_requested,
 )
 from models.rules.coupon import (
-    COUPON_DISCOUNT_CENTS,
-    MIN_ORDER_VALUE_CENTS,
+    CouponRule,
     budget_allows,
     discount_cents,
     reais_to_cents,
@@ -98,12 +102,16 @@ class Checkout:
 
     Recebe o ``SimulationState`` do controller (ADR-005 §2), a configuração
     da execução e o motor pela interface ``DecisionEngine``. Único escritor
-    de contas, orçamento e eventos do caminho PE1 → decisão → PE2.
+    de contas, orçamento e eventos do caminho PE1 → decisão → PE2. A regra
+    do cupom é derivada da configuração na construção (``rule``), em
+    centavos inteiros — nenhum valor de negócio fica fixo no código
+    (ADR-005 §3).
     """
 
     state: SimulationState
     config: SimulationConfig
     engine: DecisionEngine
+    rule: CouponRule = field(init=False)
 
     def __post_init__(self) -> None:
         if not isinstance(self.state, SimulationState):
@@ -112,18 +120,7 @@ class Checkout:
             raise ValueError(f"config: esperado SimulationConfig, obtido {type(self.config).__name__}")
         if not callable(getattr(self.engine, "decide", None)):
             raise ValueError("engine: esperado motor com decide(attempt, state) (DecisionEngine)")
-        if reais_to_cents(self.config.coupon.discount) != COUPON_DISCOUNT_CENTS:
-            raise ValueError(
-                "config.coupon.discount: diverge da regra do cupom "
-                f"(esperado R$ {COUPON_DISCOUNT_CENTS / 100:.2f}; "
-                f"obtido R$ {self.config.coupon.discount:.2f})"
-            )
-        if reais_to_cents(self.config.coupon.min_order) != MIN_ORDER_VALUE_CENTS:
-            raise ValueError(
-                "config.coupon.min_order: diverge da regra do cupom "
-                f"(esperado R$ {MIN_ORDER_VALUE_CENTS / 100:.2f}; "
-                f"obtido R$ {self.config.coupon.min_order:.2f})"
-            )
+        self.rule = CouponRule.from_config(self.config.coupon)
 
     # -- PE1: cadastro ------------------------------------------------------
 
@@ -196,12 +193,16 @@ class Checkout:
     ) -> Outcome:
         """Conclui o pedido (PE2), aplicando a regra do cupom (AGENTS.md §6).
 
-        Recusa, verificação pedida e pedido abaixo do mínimo não debita o
-        orçamento nem geram ``redemption_completed``. Na conclusão elegível,
-        o desconto é debitado uma única vez, a conta perde a elegibilidade
-        de forma permanente e a comissão configurada é creditada no mesmo
-        evento do resgate. Com orçamento esgotado, a conclusão é bloqueada
-        com ``rate_limited`` genérico, sem revelar a regra interna.
+        Recusa e verificação pedida não debitam o orçamento nem geram
+        ``redemption_completed``. A primeira compra de valor até o mínimo é
+        concluída **sem desconto** e fecha a elegibilidade da conta para
+        sempre (decisão do grupo, plano revisado §11) — sem resposta
+        ``coupon_already_used``, pois o cupom nunca foi usado. Na conclusão
+        elegível, o desconto é debitado uma única vez, a conta perde a
+        elegibilidade de forma permanente e a comissão configurada é
+        creditada no mesmo evento do resgate. Com orçamento esgotado, a
+        conclusão é bloqueada com ``rate_limited`` genérico, sem revelar a
+        regra interna.
 
         ``occurred_at`` é o instante simulado da conclusão, em horas.
         """
@@ -234,16 +235,13 @@ class Checkout:
             return decision.outcome
 
         order_value_cents = reais_to_cents(order.value)
-        discount = discount_cents(
-            first_purchase_completed=account.first_purchase_completed,
-            coupon_used=not account.is_eligible,
-            order_value_cents=order_value_cents,
-        )
-        if discount == 0:
-            # A regra do cupom recusa no PE2: pedido abaixo do mínimo ou
-            # cupom já usado na conta. O vocabulário público é fechado
-            # (ADR-011 §4): recusa de cupom é ``coupon_already_used``; o
-            # motivo vive na mensagem, não no vocabulário.
+
+        if account.first_purchase_completed:
+            # O cupom vale só para a primeira compra: concluída ela, nenhum
+            # pedido seguinte da conta recebe desconto. A recusa pública é
+            # ``coupon_already_used`` (vocabulário fechado, ADR-011 §4); o
+            # motivo vive na mensagem interna, não no vocabulário. Não há
+            # conclusão nem débito.
             outcome = Outcome.COUPON_ALREADY_USED
             coupon_decided(
                 self.state,
@@ -252,14 +250,27 @@ class Checkout:
                     attempt_id=attempt.attempt_id,
                     outcome=outcome,
                     public_message="Não foi possível aplicar o cupom a este pedido.",
-                    internal_reason=(
-                        "first_purchase_completed" if account.first_purchase_completed
-                        else "order_below_minimum"
-                    ),
+                    internal_reason="first_purchase_completed",
                     policy_version=self.state.policy.version,
                 ),
             )
             return outcome
+
+        discount = discount_cents(
+            rule=self.rule,
+            first_purchase_completed=False,
+            coupon_used=False,
+            order_value_cents=order_value_cents,
+        )
+        if discount == 0:
+            # Primeira compra de valor até o mínimo (decisão do grupo, plano
+            # revisado §11): o pedido é CONCLUÍDO sem desconto e a conta
+            # perde a elegibilidade para sempre. Não é ``coupon_already_used``
+            # — o cupom nunca foi usado. Sem débito: nada há a cobrar do
+            # orçamento de aquisição.
+            self.state.accounts[account.account_id] = account.complete_first_purchase()
+            order_completed(self.state, attempt, order, occurred_at=occurred_at)
+            return Outcome.ACCEPTED
 
         consumed_cents = round(self.state.budget_consumed * 100)
         remaining_cents = reais_to_cents(self.config.budget.acquisition) - consumed_cents

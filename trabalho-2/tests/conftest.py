@@ -19,11 +19,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MINIMAL_CONFIG: dict[str, object] = {
     "rounds": {
         "count": 3,
+        "min": 3,
         "days_per_round": 7,
         "legit_customers": 10,
         "shared_device_pct": 0,
         "shared_address_pct": 0,
         "abandonment_pct": 0,
+        "base_conversion": {"b1": 0.7, "b2": 0.55},
     },
     "budget": {"acquisition": 1000.0, "attack": 100.0},
     "coupon": {"discount": 20.0, "min_order": 30.0, "commission_rate": 0.2},

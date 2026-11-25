@@ -8,12 +8,14 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "agno==3.1.7",
+    "agno[anthropic,groq,sqlite]==3.1.7",
     "pandas>=3.1.1",
+    "python-dotenv>=1.0.0",
 ]
 
-[project.scripts]
-trabalho-2 = "views.app:main"
+# Sem console script por ora: o antigo `trabalho-2` servia o build do frontend
+# e foi retirado na I-01. O comando volta na I-08 apontando para o `main.py`
+# do simulador. Para servir o build do front: `uv run python -m views.app`.
 
 [tool.uv.build-backend]
 module-name = ["models", "agents", "controllers", "views", "evaluation"]
