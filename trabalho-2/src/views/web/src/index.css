@@ -1,0 +1,220 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  --color-paper: #f6f6f2;
+  --color-surface: #ffffff;
+  --color-ink: #161a18;
+  --color-muted: #5c6661;
+  --color-faint: #8a938e;
+  --color-line: #e1e4de;
+  --color-line-strong: #c8cec7;
+
+  --color-accent: #cc4419;
+  --color-accent-ink: #a53612;
+  --color-accent-soft: #fbece5;
+
+  --color-bot: #5746c8;
+  --color-bot-soft: #f1eefe;
+  --color-engine: #0a6b63;
+  --color-engine-soft: #e9f4f1;
+
+  --color-accepted: #17703f;
+  --color-accepted-soft: #e9f5ee;
+  --color-refused: #a6291f;
+  --color-refused-soft: #fbeeec;
+  --color-verification: #8a5a08;
+  --color-verification-soft: #fdf5e2;
+  --color-limited: #3a3fa0;
+  --color-limited-soft: #eef0fb;
+  --color-neutral: #46524b;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    font-feature-settings: 'ss01' on;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  ::selection {
+    background: #f4c9b8;
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  /* Números sempre em mono tabular: o dado tem que alinhar em coluna. */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .panel {
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+    background: var(--color-surface);
+  }
+
+  /* Faixa de métricas: um extrato, não uma coleção de cartões. */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+    background: var(--color-surface);
+  }
+
+  .stat {
+    padding: 12px 14px;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .stat:nth-child(-n + 2) {
+    border-top: 0;
+  }
+
+  .stat:nth-child(even) {
+    border-left: 1px solid var(--color-line);
+  }
+
+  @media (min-width: 768px) {
+    .stat-strip {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .stat {
+      border-top: 0;
+      border-left: 1px solid var(--color-line);
+    }
+
+    .stat:nth-child(4n + 1) {
+      border-left: 0;
+    }
+
+    /* Em tablets, 6 ou 8 métricas quebram em duas linhas: separa a segunda. */
+    .stat:nth-child(n + 5) {
+      border-top: 1px solid var(--color-line);
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .stat-strip[data-cols='6'] {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .stat-strip[data-cols='8'] {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+
+    .stat-strip[data-cols='6'] .stat,
+    .stat-strip[data-cols='8'] .stat {
+      border-top: 0;
+      border-left: 1px solid var(--color-line);
+    }
+
+    .stat-strip[data-cols='6'] .stat:nth-child(6n + 1),
+    .stat-strip[data-cols='8'] .stat:nth-child(8n + 1) {
+      border-left: 0;
+    }
+  }
+
+  /* Trilho da cadeia causal: o diagrama é o argumento da tela. */
+  .lane {
+    border-left: 3px solid var(--color-line-strong);
+    background: color-mix(in srgb, var(--color-paper) 55%, white);
+  }
+
+  .lane-bot {
+    border-left-color: var(--color-bot);
+    background: color-mix(in srgb, var(--color-bot-soft) 55%, white);
+  }
+
+  .lane-engine {
+    border-left-color: var(--color-engine);
+    background: color-mix(in srgb, var(--color-engine-soft) 55%, white);
+  }
+
+  .rule-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-muted);
+  }
+}
+
+@layer utilities {
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
+  .scroll-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scroll-thin::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 999px;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 12px;
+    top: -60px;
+    z-index: 100;
+    border-radius: 8px;
+    background: var(--color-ink);
+    padding: 8px 12px;
+    color: white;
+    font-size: 13px;
+    transition: top 120ms ease;
+  }
+
+  .skip-link:focus {
+    top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

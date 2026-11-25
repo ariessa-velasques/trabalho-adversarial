@@ -1,23 +1,37 @@
 [project]
 name = "trabalho-2"
 version = "0.1.0"
-description = "Add your description here"
+description = "Simulador adversarial do cupom BEMVINDO no PedeJá"
 readme = "README.md"
 authors = [
     { name = "Ed Ferreira", email = "eduardoodferreiradev@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "agno==3.1.7",
+    "agno[anthropic,groq,sqlite]==3.1.7",
     "pandas>=3.1.1",
-    "streamlit>=1.67.0",
+    "python-dotenv>=1.0.0",
 ]
 
-[project.scripts]
-trabalho-2 = "views.app:main"
+# Sem console script por ora: o antigo `trabalho-2` servia o build do frontend
+# e foi retirado na I-01. O comando volta na I-08 apontando para o `main.py`
+# do simulador. Para servir o build do front: `uv run python -m views.app`.
 
 [tool.uv.build-backend]
 module-name = ["models", "agents", "controllers", "views", "evaluation"]
+# O frontend é construído com npm; node_modules e artefatos de desenvolvimento não
+# entram no pacote. O build final (views/web/dist) é incluído para o wheel servir a UI.
+source-exclude = ["web/node_modules/**", "web/.vite/**", "web/*.tsbuildinfo"]
+wheel-exclude = [
+    "web/node_modules/**",
+    "web/src/**",
+    "web/index.html",
+    "web/package.json",
+    "web/package-lock.json",
+    "web/tsconfig.json",
+    "web/vite.config.ts",
+    "web/*.tsbuildinfo",
+]
 
 [build-system]
 requires = ["uv_build>=0.13.7,<0.14.0"]
@@ -26,4 +40,11 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "llm: teste que exige LLM externo e chave no ambiente; pulado sem chave (ADR-009)",
 ]
